@@ -30,7 +30,6 @@ def so3_equatorial_grid(max_beta=0, max_gamma=np.pi / 8, n_alpha=32, n_beta=1, n
     :return: rings of rotations around the equator.
     size of the kernel = n_alpha * n_beta * n_gamma
     '''
-    #differance is beta between equatorial_grid and identity grid
     beta = np.linspace(start=np.pi/2 - max_beta, stop=np.pi/2 + max_beta, num=n_beta, endpoint=True)
     alpha = np.linspace(start=0, stop=2 * np.pi, num=n_alpha, endpoint=False)
     gamma = np.linspace(start=-max_gamma, stop=max_gamma, num=n_gamma, endpoint=True)

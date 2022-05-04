@@ -91,13 +91,13 @@ def so3_rfft(x, for_grad=False, b_out=None):
         cuda_kernel = _setup_so3fft_cuda_kernel(b_in=b_in, b_out=b_out, nbatch=nbatch, real_input=True, device=x.device.index)
         cuda_kernel(x, wigner, output)
     else:
-        #x = torch.view_as_real(torch.fft.rfftn((torch.stack((x, torch.zeros_like(x)), dim=-1)), dim=[2,3]))
-        x = torch.view_as_real(torch.fft.rfftn(x, dim=[2, 3]))
+        x = torch.view_as_real(torch.fft.rfftn(torch.view_as_complex(torch.stack((x, torch.zeros_like(x)), dim=-1)), dim=[2,3]))
         if b_in < b_out:
             output.fill_(0)
         for l in range(b_out):
             s = slice(l * (4 * l**2 - 1) // 3, l * (4 * l**2 - 1) // 3 + (2 * l + 1) ** 2)
             l1 = min(l, b_in - 1)  # if b_out > b_in, consider high frequencies as null
+
             xx = x.new_zeros((x.size(0), x.size(1), 2 * l + 1, 2 * l + 1, 2))
             xx[:, :, l: l + l1 + 1, l: l + l1 + 1] = x[:, :, :l1 + 1, :l1 + 1]
             if l1 > 0:
