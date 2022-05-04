@@ -1,5 +1,7 @@
 #Thesis Project Models using Speherical CNNs as defined by [1],[2],and [3]
 
+For data Generation used for these models, see my other repository:
+https://github.com/KryptixOne/Spherical-Data-Generation-For-3D-Meshes
 
 
 
