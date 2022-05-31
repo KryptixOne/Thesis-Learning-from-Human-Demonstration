@@ -4,3 +4,5 @@ TrainData_6000_Pos_Depth
 Datasmall
 Backup_Data
 cache
+CheckpointEpoch16
+DataToPreSplit

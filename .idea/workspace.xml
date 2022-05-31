@@ -3,10 +3,16 @@
   <component name="ChangeListManager">
     <list default="true" id="7332ea9b-4bd4-48df-9136-8ecbc09ac964" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model1/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/Model1/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model1/cache/setup_s2_fft/index.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/Model1/cache/setup_s2_fft/index.pkl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model1/cache/setup_s2_ft/index.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/Model1/cache/setup_s2_ft/index.pkl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model1/cache/setup_so3_fft/index.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/Model1/cache/setup_so3_fft/index.pkl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model1/MNIST_data/MNIST/processed/test.pt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model1/MNIST_data/MNIST/processed/training.pt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model1/MNIST_data/MNIST/raw/t10k-images-idx3-ubyte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model1/MNIST_data/MNIST/raw/t10k-images-idx3-ubyte.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model1/MNIST_data/MNIST/raw/t10k-labels-idx1-ubyte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model1/MNIST_data/MNIST/raw/t10k-labels-idx1-ubyte.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model1/MNIST_data/MNIST/raw/train-images-idx3-ubyte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model1/MNIST_data/MNIST/raw/train-images-idx3-ubyte.gz" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model1/MNIST_data/MNIST/raw/train-labels-idx1-ubyte" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model1/MNIST_data/MNIST/raw/train-labels-idx1-ubyte.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Model1/cache/setup_so3_ft/index.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/Model1/cache/setup_so3_ft/index.pkl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Model1/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model1/run.py" afterDir="false" />
     </list>
@@ -109,7 +115,8 @@
       <workItem from="1651840653181" duration="559000" />
       <workItem from="1651843197194" duration="1871000" />
       <workItem from="1652180248934" duration="15000" />
-      <workItem from="1652345880287" duration="28889000" />
+      <workItem from="1652345880287" duration="66167000" />
+      <workItem from="1653725260564" duration="34429000" />
     </task>
     <servers />
   </component>
@@ -137,13 +144,8 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Model1/run.py</url>
-          <line>286</line>
-          <option name="timeStamp" value="61" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Model1/run.py</url>
-          <line>285</line>
-          <option name="timeStamp" value="62" />
+          <line>632</line>
+          <option name="timeStamp" value="149" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -154,9 +156,14 @@
         </breakpoint>
       </default-breakpoints>
     </breakpoint-manager>
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="x" />
+      </configuration>
+    </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/ThesisCode_Models$run.coverage" NAME="run Coverage Results" MODIFIED="1653314138493" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Model1" />
+    <SUITE FILE_PATH="coverage/ThesisCode_Models$run.coverage" NAME="run Coverage Results" MODIFIED="1653988085501" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Model1" />
     <SUITE FILE_PATH="coverage/ThesisCode_Models$Model1.coverage" NAME="Model1 Coverage Results" MODIFIED="1651841043265" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Model1" />
   </component>
 </project>
