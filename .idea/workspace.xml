@@ -3,17 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="7332ea9b-4bd4-48df-9136-8ecbc09ac964" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model1/MNIST_data/MNIST/processed/test.pt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model1/MNIST_data/MNIST/processed/training.pt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model1/MNIST_data/MNIST/raw/t10k-images-idx3-ubyte" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model1/MNIST_data/MNIST/raw/t10k-images-idx3-ubyte.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model1/MNIST_data/MNIST/raw/t10k-labels-idx1-ubyte" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model1/MNIST_data/MNIST/raw/t10k-labels-idx1-ubyte.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model1/MNIST_data/MNIST/raw/train-images-idx3-ubyte" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model1/MNIST_data/MNIST/raw/train-images-idx3-ubyte.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model1/MNIST_data/MNIST/raw/train-labels-idx1-ubyte" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model1/MNIST_data/MNIST/raw/train-labels-idx1-ubyte.gz" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Model1/cache/setup_so3_ft/index.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/Model1/cache/setup_so3_ft/index.pkl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Model1/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model1/run.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -34,7 +23,6 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Model1/run.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$USER_HOME$/AppData/Local/JetBrains/PyCharm2021.3/remote_sources/1915140913/227358125/gzip.py" root0="SKIP_INSPECTION" />
-    <setting file="file://$PROJECT_DIR$/Model1/Model1.py" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -46,6 +34,7 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
@@ -116,7 +105,9 @@
       <workItem from="1651843197194" duration="1871000" />
       <workItem from="1652180248934" duration="15000" />
       <workItem from="1652345880287" duration="66167000" />
-      <workItem from="1653725260564" duration="34429000" />
+      <workItem from="1653725260564" duration="63455000" />
+      <workItem from="1654242558400" duration="24017000" />
+      <workItem from="1654599836314" duration="13729000" />
     </task>
     <servers />
   </component>
@@ -138,14 +129,24 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Model1/Model1.py</url>
-          <line>52</line>
-          <option name="timeStamp" value="2" />
+          <url>file://$PROJECT_DIR$/Model1/run.py</url>
+          <line>532</line>
+          <option name="timeStamp" value="190" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Model1/run.py</url>
-          <line>632</line>
-          <option name="timeStamp" value="149" />
+          <line>506</line>
+          <option name="timeStamp" value="191" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Model1/run.py</url>
+          <line>534</line>
+          <option name="timeStamp" value="192" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Model1/run.py</url>
+          <line>535</line>
+          <option name="timeStamp" value="193" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -163,7 +164,7 @@
     </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/ThesisCode_Models$run.coverage" NAME="run Coverage Results" MODIFIED="1653988085501" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Model1" />
+    <SUITE FILE_PATH="coverage/ThesisCode_Models$run.coverage" NAME="run Coverage Results" MODIFIED="1654705984824" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Model1" />
     <SUITE FILE_PATH="coverage/ThesisCode_Models$Model1.coverage" NAME="Model1 Coverage Results" MODIFIED="1651841043265" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Model1" />
   </component>
 </project>

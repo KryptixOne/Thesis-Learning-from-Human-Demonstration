@@ -2,7 +2,7 @@
 import numpy as np
 import torch.nn as nn
 import torchvision.transforms
-
+from torchvision.models import resnet18
 from s2cnn import SO3Convolution
 from s2cnn import S2Convolution
 from s2cnn import so3_integrate
@@ -11,15 +11,15 @@ from s2cnn import s2_near_identity_grid
 import torch.nn.functional as F
 import torch
 import torch.utils.data as data_utils
-import gzip
 import pickle
 import numpy as np
-from torch.autograd import Variable
 import argparse
 from sklearn.model_selection import train_test_split
 from math import isnan
 from random import shuffle
 import shutil
+import wandb
+import time
 
 # temp path for Data
 DATASET_PATH_win = r"D:/Thesis/ThesisCode_Models/DataToWorkWith/Data_Spherical_With_PosPmaps60.pickle"
@@ -33,11 +33,7 @@ MNIST_PATH = "s2_mnist.gz"
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-NUM_EPOCHS = 2000
-BATCH_SIZE = 8
-LEARNING_RATE = 5e-3
-LOAD_CHECKPOINT = True
-CHECKPOINT_PATH = '/mnt/d/Thesis/ThesisCode_Models/Model1/CheckpointEpoch16/checkpoint_best_loss.pth.tar'
+
 
 
 def load_data(path, batch_size, keys_path=None, bad_keys_path=None):
@@ -45,6 +41,7 @@ def load_data(path, batch_size, keys_path=None, bad_keys_path=None):
     data_not_formatted = False
     load_test_data = False
     start_training = True
+    use_Res_net = False
 
     if pre_split_available == False:  # if pre-split data is not available
         with open(path, 'rb') as f:
@@ -199,6 +196,9 @@ def load_data(path, batch_size, keys_path=None, bad_keys_path=None):
             Y_train[:, None, :, :].astype(np.float32))
 
         Y_train = None  # free up memory
+        if use_Res_net == True:
+            train_data = (1 / 2) * train_data
+            train_data = torch.cat((train_data, train_data, train_data), dim=1)
 
         train_dataset = data_utils.TensorDataset(train_data, train_labels)
         train_loader = data_utils.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
@@ -210,6 +210,10 @@ def load_data(path, batch_size, keys_path=None, bad_keys_path=None):
         val_labels = torch.from_numpy(
             Y_val[:, None, :, :].astype(np.float32))
         Y_val = None  # free up memory
+
+        if use_Res_net == True:
+            val_data = (1 / 2) * val_data
+            val_data = torch.cat((val_data, val_data, val_data), dim=1)
 
         val_dataset = data_utils.TensorDataset(val_data, val_labels)
         val_loader = data_utils.DataLoader(val_dataset, batch_size=batch_size, shuffle=True)
@@ -339,6 +343,104 @@ class SphericalModelDeep(nn.Module):
         # print()
         # x = so3_integrate(x)
         # x = self.linear(x)
+        return x
+
+
+class ResNetModelBased(nn.Module):
+
+    def __init__(self):
+        super(ResNetModelBased, self).__init__()
+        # Computational Graph Version
+
+        self.model = resnet18(pretrained=True)
+
+        # Last Layers
+
+        self.convd1 = nn.Conv2d(512, 512, 9)
+        self.convd2 = nn.Conv2d(512, 1, 9)
+
+    def forward(self, x):
+        img_xformer = torchvision.transforms.Resize(
+            (x.shape[2] * 6, x.shape[3] * 6))  # since height and width need at least 224
+        x = img_xformer(x)
+
+        x = self.model.conv1(x)
+        x = self.model.bn1(x)
+        x = self.model.relu(x)
+        x = self.model.maxpool(x)
+
+        x = self.model.layer1(x)
+        x = self.model.layer2(x)
+        x = self.model.layer3(x)
+        x = self.model.layer4(x)
+
+        # x = self.model.avgpool(x)
+        preXformer = torchvision.transforms.Resize((30, 30))
+        x = preXformer(x)
+
+        x = self.convd1(x)
+        x = F.relu(x)
+        x = self.convd2(x)
+        finalXformer = torchvision.transforms.Resize((60, 60))
+        x = finalXformer(x)
+
+        return x
+
+
+class ModelBasedOnPaperGitHubVersionSINGLEBRANCH(nn.Module):
+
+    def __init__(self, config):
+        super(ModelBasedOnPaperGitHubVersionSINGLEBRANCH, self).__init__()
+        # Computational Graph Version
+        # original filters, 5 5 5 9 9 9
+        # changed filters, 3 3 3 5 5 5
+        self.conva1 = nn.Conv2d(1, 64, config['num_filters'])
+        self.poola = nn.MaxPool2d(2, 2)
+        #self.bn1 = nn.BatchNorm2d(64)
+        self.conva2 = nn.Conv2d(64, 128, config['num_filters'])
+        self.poola1 = nn.MaxPool2d(2, 2)
+        #self.bn2 = nn.BatchNorm2d(128)
+        self.conva3 = nn.Conv2d(128, 256,config['num_filters'])
+        #self.bn3 = nn.BatchNorm2d(256)
+        self.conva4 = nn.Conv2d(256, 512, config['num_filters_FC'])
+        #self.bn4 = nn.BatchNorm2d(512)
+        # Last Layers
+
+        self.convd1 = nn.Conv2d(512, 512, config['num_filters_FC'])
+        #self.bn5 = nn.BatchNorm2d(512)
+        self.convd2 = nn.Conv2d(512, 1,config['num_filters_FC'])
+
+    def forward(self, x):
+        img_xformer = torchvision.transforms.Resize((x.shape[2] * 3, x.shape[3] * 3))
+        x = img_xformer(x)
+        x1 = x
+        # img_xformer2 = torchvision.transforms.Resize((x.shape[2] // 4, x.shape[3] // 4))
+        x = self.conva1(x)
+        x = F.relu(x)
+
+
+        x = self.poola(x)
+        x = self.conva2(x)
+        x = F.relu(x)
+
+
+        x = self.poola1(x)
+        x = self.conva3(x)
+        x = F.relu(x)
+
+
+        x = self.conva4(x)
+        x = F.relu(x)
+
+
+        x = self.convd1(x)
+        x = F.relu(x)
+
+        x = self.convd2(x)
+
+        finalXformer = torchvision.transforms.Resize((60, 60))
+        x = finalXformer(x)
+
         return x
 
 
@@ -559,9 +661,10 @@ def save_checkpoint(state, is_best, filename="checkpoint.pth.tar"):
         shutil.copyfile(filename, "checkpoint_best_loss.pth.tar")
 
 
-def main(network):
+
+def main(network, config=None):
     train_loader, test_loader, train_dataset, _ = load_data(
-        DATASET_TO_SPLIT_NORMALIZED, BATCH_SIZE, KEYS_USED, BAD_KEYS)
+        DATASET_TO_SPLIT_NORMALIZED, config['batch_size'], KEYS_USED, BAD_KEYS)
 
     if network == 'SphericalModel':
         model = SphericalModelDeep()
@@ -571,6 +674,19 @@ def main(network):
         model = ShallowModelBasedOnPaperNoneSpherical()
     elif network == 'GithubBasedPaper':
         model = ModelBasedOnPaperGitHubVersion()
+    elif network == 'ResNetBased':
+
+        model = ResNetModelBased()
+        model.model.conv1.requires_grad_(False)
+        model.model.bn1.requires_grad_(False)
+        model.model.maxpool.requires_grad_(False)
+        model.model.layer1.requires_grad_(False)
+        model.model.layer2.requires_grad_(False)
+        model.model.layer3.requires_grad_(False)
+    elif network == 'GithubBasedPaperSingleBranch':
+        model = ModelBasedOnPaperGitHubVersionSINGLEBRANCH(config)
+
+
 
     else:
         raise ValueError('Unknown network architecture')
@@ -584,21 +700,22 @@ def main(network):
     # optimizer = torch.optim.Adam(
     #    model.parameters(),
     #    lr=LEARNING_RATE)
-    optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE, nesterov=True, momentum=0.9)
+    optimizer = torch.optim.SGD(model.parameters(), lr=config['learning_rate'], nesterov=True, momentum=config['momentum'])
     lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min')
-    last_epoch =0
+    last_epoch = 0
     if LOAD_CHECKPOINT == True:
-        print('loading checkpoint from '+ CHECKPOINT_PATH)
-        checkpoint = torch.load(CHECKPOINT_PATH,map_location = DEVICE)
-        last_epoch = checkpoint["epoch"]+1
+        print('loading checkpoint from ' + CHECKPOINT_PATH)
+        checkpoint = torch.load(CHECKPOINT_PATH, map_location=DEVICE)
+        last_epoch = checkpoint["epoch"] + 1
         model.load_state_dict(checkpoint["state_dict"])
         optimizer.load_state_dict((checkpoint["optimizer"]))
         lr_scheduler.load_state_dict(checkpoint["lr_scheduler"])
-        checkpoint = None #Free up GPU memory
+        checkpoint = None  # Free up GPU memory
 
+    time.sleep(10)
 
     best_loss = float("inf")
-    for epoch in range(last_epoch,NUM_EPOCHS):
+    for epoch in range(last_epoch, config['epochs']):
 
         for i, (images, labels) in enumerate(train_loader):
             model.train()
@@ -616,9 +733,10 @@ def main(network):
             optimizer.step()
 
             print('\rEpoch [{0}/{1}], Iter [{2}/{3}] Loss: {4:.10f}'.format(
-                epoch + 1, NUM_EPOCHS, i + 1, len(train_dataset) // BATCH_SIZE,
+                epoch + 1, config['epochs'], i + 1, len(train_dataset) // config['batch_size'],
                 loss.item()), end="")
         print("")
+
         totalloss = 0
         curepoch = 0
 
@@ -638,6 +756,11 @@ def main(network):
         totalloss = totalloss / curepoch
         lr_scheduler.step(totalloss)
 
+        wandb.log({"loss": totalloss})
+
+        # Optional
+        wandb.watch(model)
+
         is_best = totalloss < best_loss
         best_loss = min(totalloss, best_loss)
 
@@ -649,7 +772,7 @@ def main(network):
                 "optimizer": optimizer.state_dict(),
                 "lr_scheduler": lr_scheduler.state_dict(),
             },
-            is_best, filename=str(network) + str(epoch) + "checkpoint.pth.tar"
+            is_best, filename=str(network) + "checkpoint.pth.tar"
         )
 
         print('Validation MSE Loss: ', np.asarray(totalloss.detach().cpu()))
@@ -657,16 +780,65 @@ def main(network):
 
         # print('Test Accuracy: {0}'.format(100 * correct / total))
 
-    print('complete')
-    input('press a key to end')
+
+
+
+
+
+LOAD_CHECKPOINT = True
+CHECKPOINT_PATH = r'D:/Thesis/ThesisCode_Models/Model1/2_2_singleBatch_E159/checkpoint_best_loss.pth.tar'
+
+CONFIG = {
+    'batch_size': 32,
+    'epochs': 10000,
+    'num_filters': 2,
+    'num_filters_FC': 2,
+    'momentum': 0.9,
+    'learning_rate':5e-3
+
+}
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--network",
                         help="network architecture to use",
-                        default='GithubBasedPaper',
-                        choices=['SphericalModel', 'PaperBased', 'ShallowPaper', 'GithubBasedPaper'])
+                        default='GithubBasedPaperSingleBranch',
+                        choices=['SphericalModel', 'PaperBased', 'ShallowPaper', 'GithubBasedPaper', 'ResNetBased',
+                                 'GithubBasedPaperSingleBranch'])
+    parser.add_argument("--HSweep",
+                        help="To sweep or not",
+                        default='NoSweep',
+                        choices=['Sweep', 'NoSweep'])
+
     args = parser.parse_args()
 
-    main(args.network)
+
+    def train_function():
+        with wandb.init(project ='HyperParametersSingleBranch',config = CONFIG, entity = 'kryptixone'):
+            main(args.network, wandb.config)
+
+    if args.HSweep == 'Sweep':
+
+        SWEEP_CONFIG = {'method': 'random'}
+        metric = {'name': 'loss',
+                  'goal': 'minimize'}
+        SWEEP_CONFIG['metric'] = metric
+
+        parameters_dict = {
+            'num_filters': {'values': [1,2,3,4, 5]},
+            'num_filters_FC': {'values': [1,2,3,4,5,6,7, 8, 9]},
+            #'learning_rate': {'distribution': 'uniform',
+            #                  'min': 0,
+            #                  'max': 0.05},
+            'learning_rate': {'value':5e-3},
+            'momentum': {'value': 0.9}
+        }
+        SWEEP_CONFIG['parameters'] = parameters_dict
+
+        parameters_dict.update({'epochs': {'value': 5}})
+        parameters_dict.update({'batch_size': {'value': 4}})
+        sweep_id = wandb.sweep(SWEEP_CONFIG, project="HyperParametersSingleBranch")
+        wandb.agent(sweep_id, function=train_function, count=100)  # main(args.network)
+    else:
+        train_function()

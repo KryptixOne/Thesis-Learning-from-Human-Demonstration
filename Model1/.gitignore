@@ -6,3 +6,6 @@ Backup_Data
 cache
 CheckpointEpoch16
 DataToPreSplit
+2_2_singleBatch_E159
+3_3_singleBranch
+wandb
