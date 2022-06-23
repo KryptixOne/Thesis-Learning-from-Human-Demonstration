@@ -3,7 +3,13 @@
   <component name="ChangeListManager">
     <list default="true" id="7332ea9b-4bd4-48df-9136-8ecbc09ac964" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model1/cache/setup_s2_fft/index.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/Model1/cache/setup_s2_fft/index.pkl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model1/cache/setup_s2_ft/index.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/Model1/cache/setup_s2_ft/index.pkl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model1/cache/setup_so3_fft/index.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/Model1/cache/setup_so3_fft/index.pkl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model1/cache/setup_so3_ft/index.pkl" beforeDir="false" afterPath="$PROJECT_DIR$/Model1/cache/setup_so3_ft/index.pkl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Model1/run.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model1/run.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/s2cnn/soft/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/s2cnn/soft/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/s2cnn/soft/so3_integrate.py" beforeDir="false" afterPath="$PROJECT_DIR$/s2cnn/soft/so3_integrate.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -19,6 +25,14 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Model1/run.py" root0="FORCE_HIGHLIGHTING" />
@@ -38,7 +52,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Thesis Code" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
   <component name="RunManager" selected="Python.run">
     <configuration name="Model1" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
@@ -107,7 +121,15 @@
       <workItem from="1652345880287" duration="66167000" />
       <workItem from="1653725260564" duration="63455000" />
       <workItem from="1654242558400" duration="24017000" />
-      <workItem from="1654599836314" duration="13729000" />
+      <workItem from="1654599836314" duration="22034000" />
+      <workItem from="1654935903255" duration="136000" />
+      <workItem from="1655113619649" duration="3413000" />
+      <workItem from="1655117892561" duration="2694000" />
+      <workItem from="1655126390199" duration="22122000" />
+      <workItem from="1655213898021" duration="828000" />
+      <workItem from="1655215385425" duration="12202000" />
+      <workItem from="1655309030309" duration="2044000" />
+      <workItem from="1655454021229" duration="2577000" />
     </task>
     <servers />
   </component>
@@ -130,23 +152,28 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Model1/run.py</url>
-          <line>532</line>
+          <line>616</line>
           <option name="timeStamp" value="190" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Model1/run.py</url>
-          <line>506</line>
+          <line>590</line>
           <option name="timeStamp" value="191" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Model1/run.py</url>
-          <line>534</line>
+          <line>618</line>
           <option name="timeStamp" value="192" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Model1/run.py</url>
-          <line>535</line>
+          <line>619</line>
           <option name="timeStamp" value="193" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Model1/run.py</url>
+          <line>852</line>
+          <option name="timeStamp" value="194" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -164,7 +191,7 @@
     </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/ThesisCode_Models$run.coverage" NAME="run Coverage Results" MODIFIED="1654705984824" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Model1" />
+    <SUITE FILE_PATH="coverage/ThesisCode_Models$run.coverage" NAME="run Coverage Results" MODIFIED="1655454071297" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Model1" />
     <SUITE FILE_PATH="coverage/ThesisCode_Models$Model1.coverage" NAME="Model1 Coverage Results" MODIFIED="1651841043265" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Model1" />
   </component>
 </project>

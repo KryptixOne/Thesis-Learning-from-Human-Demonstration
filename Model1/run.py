@@ -1,11 +1,10 @@
 # pylint: disable=E1101,R,C
-import numpy as np
 import torch.nn as nn
 import torchvision.transforms
 from torchvision.models import resnet18
 from s2cnn import SO3Convolution
 from s2cnn import S2Convolution
-from s2cnn import so3_integrate
+from s2cnn import so3_integrate, so3_integrate_only_gamma
 from s2cnn import so3_near_identity_grid
 from s2cnn import s2_near_identity_grid
 import torch.nn.functional as F
@@ -15,11 +14,13 @@ import pickle
 import numpy as np
 import argparse
 from sklearn.model_selection import train_test_split
-from math import isnan
+from math import isnan, sqrt, ceil
 from random import shuffle
 import shutil
 import wandb
 import time
+from matplotlib import pyplot as plt
+import cv2
 
 # temp path for Data
 DATASET_PATH_win = r"D:/Thesis/ThesisCode_Models/DataToWorkWith/Data_Spherical_With_PosPmaps60.pickle"
@@ -34,14 +35,11 @@ MNIST_PATH = "s2_mnist.gz"
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
-
-
-def load_data(path, batch_size, keys_path=None, bad_keys_path=None):
+def load_data(path, batch_size, keys_path=None, bad_keys_path=None, network=None):
     pre_split_available = True
     data_not_formatted = False
     load_test_data = False
     start_training = True
-    use_Res_net = False
 
     if pre_split_available == False:  # if pre-split data is not available
         with open(path, 'rb') as f:
@@ -186,9 +184,23 @@ def load_data(path, batch_size, keys_path=None, bad_keys_path=None):
         assert not np.any(np.isnan(Y_val))
 
         # Y_train = Y_train+X_train
+        if network == 'SingleBranchHpLp':
+            X_train_Hp = np.zeros_like(X_train)
+            X_train_Lp = np.zeros_like(X_train)
+            for x in range(X_train.shape[0]):
+                X_train_Hp[x, :, :] = cv2.Laplacian(X_train[x, :, :], cv2.CV_64F)
+                X_train_Lp[x, :, :] = cv2.GaussianBlur(X_train[x, :, :], (5, 5), 0)
+            X_train_Hp = np.expand_dims(X_train_Hp, axis=1)
+            X_train_Lp = np.expand_dims(X_train_Lp, axis=1)
+            X_train = np.concatenate((X_train_Hp, X_train_Lp), axis=1)
+            X_train_Hp = None
+            X_train_Lp = None
 
-        train_data = torch.from_numpy(
-            X_train[:, None, :, :].astype(np.float32))  # creates extra dimension [60000, 1, 60,60]
+            train_data = torch.from_numpy(
+                X_train[:, None, :, :, :].astype(np.float32))  # creates extra dimension [60000, 1, 60,60]
+        else:
+            train_data = torch.from_numpy(
+                X_train[:, None, :, :].astype(np.float32))
 
         X_train = None  # free up memory
 
@@ -196,22 +208,37 @@ def load_data(path, batch_size, keys_path=None, bad_keys_path=None):
             Y_train[:, None, :, :].astype(np.float32))
 
         Y_train = None  # free up memory
-        if use_Res_net == True:
+        if network == 'ResNetBased':
             train_data = (1 / 2) * train_data
             train_data = torch.cat((train_data, train_data, train_data), dim=1)
 
         train_dataset = data_utils.TensorDataset(train_data, train_labels)
         train_loader = data_utils.DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
-        val_data = torch.from_numpy(
-            X_val[:, None, :, :].astype(np.float32))
-        X_val = None  # free up memory
+        if network == 'SingleBranchHpLp':
+            X_val_Hp = np.zeros_like(X_val)
+            X_val_Lp = np.zeros_like(X_val)
+            for x in range(X_val.shape[0]):
+                X_val_Hp[x, :, :] = cv2.Laplacian(X_val[x, :, :], cv2.CV_64F)
+                X_val_Lp[x, :, :] = cv2.GaussianBlur(X_val[x, :, :], (5, 5), 0)
+            X_val_Hp = np.expand_dims(X_val_Hp, axis=1)
+            X_val_Lp = np.expand_dims(X_val_Lp, axis=1)
+            X_val = np.concatenate((X_val_Hp, X_val_Lp), axis=1)
+            X_val_Hp = None
+            X_val_Lp = None
+
+            val_data = torch.from_numpy(
+                X_val[:, None, :, :, :].astype(np.float32))
+        else:
+            val_data = torch.from_numpy(
+                X_val[:, None, :, :].astype(np.float32))
+        X_val = None  # free up memory1
 
         val_labels = torch.from_numpy(
             Y_val[:, None, :, :].astype(np.float32))
         Y_val = None  # free up memory
 
-        if use_Res_net == True:
+        if network == 'ResNetBased':
             val_data = (1 / 2) * val_data
             val_data = torch.cat((val_data, val_data, val_data), dim=1)
 
@@ -226,123 +253,90 @@ class SphericalModelDeep(nn.Module):
     def __init__(self, bandwidth=30):
         super(SphericalModelDeep, self).__init__()
 
-        grid_s2 = s2_near_identity_grid(n_alpha=6, max_beta=np.pi / 16, n_beta=1)
-        grid_so3_1 = so3_near_identity_grid(n_alpha=6, max_beta=np.pi / 16, n_beta=1, max_gamma=2 * np.pi, n_gamma=6)
-        grid_so3_2 = so3_near_identity_grid(n_alpha=6, max_beta=np.pi / 8, n_beta=1, max_gamma=2 * np.pi, n_gamma=6)
-        grid_so3_3 = so3_near_identity_grid(n_alpha=6, max_beta=np.pi / 4, n_beta=1, max_gamma=2 * np.pi, n_gamma=6)
-        grid_so3_4 = so3_near_identity_grid(n_alpha=6, max_beta=np.pi / 2, n_beta=1, max_gamma=2 * np.pi, n_gamma=6)
+        grid_s2 = s2_near_identity_grid() #roughly a 5x5 filter
+        grid_so3_4 = so3_near_identity_grid()#roughly 6x6 filter
 
         self.conv1 = S2Convolution(
             nfeature_in=1,
-            nfeature_out=16,
-            b_in=bandwidth,
-            b_out=bandwidth,
-            grid=grid_s2)
-
-        self.m = nn.MaxPool3d((2))
-        self.BatchNorm3d1 = nn.BatchNorm3d(16)
-        self.conv2 = SO3Convolution(
-            nfeature_in=16,
-            nfeature_out=32,
-            b_in=bandwidth // 2,
-            b_out=bandwidth // 2,
-            grid=grid_so3_2)
-
-        self.conv3 = SO3Convolution(
-            nfeature_in=32,
             nfeature_out=64,
-            b_in=bandwidth // 2,
-            b_out=bandwidth // 4,
-            grid=grid_so3_3)
-        self.BatchNorm3d2 = nn.BatchNorm3d(64)
-        self.C3d1 = (nn.Conv3d(64, 64, 2)).to(DEVICE)
-
-        self.conv4 = SO3Convolution(
+            b_in=bandwidth,
+            b_out=bandwidth//2,
+            grid=grid_s2)
+        self.maxpool1 = nn.MaxPool3d((1,1,bandwidth))
+        self.conv2 = S2Convolution(
             nfeature_in=64,
             nfeature_out=128,
-            b_in=bandwidth // 8,
-            b_out=bandwidth // 8,
+            b_in=bandwidth//2 ,
+            b_out=bandwidth //2,
+            grid=grid_s2)
+        self.maxpool2 = nn.MaxPool3d((1, 1, bandwidth))
+
+        self.conv3 = S2Convolution(
+            nfeature_in=128,
+            nfeature_out=256,
+            b_in=bandwidth //2,
+            b_out=bandwidth // 4,
+            grid=grid_s2)
+
+        self.conv4 = SO3Convolution(
+            nfeature_in=256,
+            nfeature_out=512,
+            b_in=bandwidth // 4,
+            b_out=bandwidth // 4,
             grid=grid_so3_4)
 
         self.conv5 = SO3Convolution(
-            nfeature_in=128,
-            nfeature_out=256,
-            b_in=bandwidth // 8,
-            b_out=bandwidth // 8,
+            nfeature_in=512,
+            nfeature_out=512,
+            b_in=bandwidth // 4,
+            b_out=bandwidth // 4,
             grid=grid_so3_4)
-        self.BatchNorm3d3 = nn.BatchNorm3d(256)
 
-        self.C3d2 = nn.Conv3d(256, 64, 1)
-        self.C3d3 = nn.Conv3d(64, 32, 1)
-
-        self.conv3inv = SO3Convolution(
-            nfeature_in=32,
+        self.conv6 = SO3Convolution(
+            nfeature_in=512,
             nfeature_out=1,
-            b_in=bandwidth // 8,
-            b_out=bandwidth,
-            grid=grid_so3_3)
-        self.BatchNorm3d4 = nn.BatchNorm3d(1)
+            b_in=bandwidth // 4,
+            b_out=bandwidth ,
+            grid=grid_so3_4)
+        self.maxpool3 = nn.MaxPool3d((1, 1, bandwidth * 2))
 
-        self.dimRed = nn.Conv3d(1, 1, (1, 1, bandwidth * 2))
 
-        """
-        self.conv2inv = SO3Convolution(
-            nfeature_in=16,
-            nfeature_out=8,
-            b_in=bandwidth // 2,
-            b_out=bandwidth,
-            grid=grid_so3_1)
 
-        self.conv1inv = SO3Convolution(
-            nfeature_in=8,
-            nfeature_out=1,
-            b_in=bandwidth,
-            b_out=bandwidth,
-            grid=grid_so3_1)
-        """
-
-        # tx = t.view(t.size(0), t.size(1), t.size(2),t.size(3),-1).max(-1)[0]
-
+    # S2->S2->S2->SO3->S03
     def forward(self, x):
+
         x = self.conv1(x)
-        x = F.relu(x)  # [batch, 8, b, b, b]
+        x = F.relu(x)
+        #x = so3_integrate_only_gamma(x)
+        x = self.maxpool1(x)
+        x = torch.squeeze(x,dim = -1)
 
-        x = self.m(x)  # [batch, 8, b/2, b/2, b/2]
 
-        x = self.BatchNorm3d1(x)
-        x = self.conv2(x)  # [30,30,30]
+        x = self.conv2(x)
+        x = F.relu(x)
+        #x = so3_integrate_only_gamma(x)
+        x= self.maxpool2(x)
+        x = torch.squeeze(x,dim = -1)
+
+        x = self.conv3(x)
         x = F.relu(x)
 
-        x = self.conv3(x)  # [14,14,14]
-        x = F.relu(x)
-        x = self.m(x)
 
-        x = self.BatchNorm3d2(x)
-        x = self.C3d1(x)
-        x = self.conv4(x)
+
 
         # fully connected model
+        x = self.conv4(x)
+        x = F.relu(x)
+
+
         x = self.conv5(x)
         x = F.relu(x)
-        x = self.BatchNorm3d3(x)
 
-        x = self.C3d2(x)
-        x = F.relu(x)
+        x = self.conv6(x)
+        x = self.maxpool3(x)
+        #x = so3_integrate_only_gamma(x)
+        x = torch.squeeze(x, dim=-1)
 
-        x = self.C3d3(x)
-        x = F.relu(x)
-
-        x = self.conv3inv(x)  # bring back to size [ batch 1 b,b,b]
-        x = self.BatchNorm3d4(x)
-        x = self.dimRed(x)
-        x = F.relu(x)
-
-        x = torch.squeeze(x, dim=4)
-        x = torch.squeeze(x, dim=1)
-
-        # print()
-        # x = so3_integrate(x)
-        # x = self.linear(x)
         return x
 
 
@@ -394,21 +388,23 @@ class ModelBasedOnPaperGitHubVersionSINGLEBRANCH(nn.Module):
         # Computational Graph Version
         # original filters, 5 5 5 9 9 9
         # changed filters, 3 3 3 5 5 5
+
         self.conva1 = nn.Conv2d(1, 64, config['num_filters'])
         self.poola = nn.MaxPool2d(2, 2)
-        #self.bn1 = nn.BatchNorm2d(64)
+        # self.bn1 = nn.BatchNorm2d(64,eps = 1)
         self.conva2 = nn.Conv2d(64, 128, config['num_filters'])
         self.poola1 = nn.MaxPool2d(2, 2)
-        #self.bn2 = nn.BatchNorm2d(128)
-        self.conva3 = nn.Conv2d(128, 256,config['num_filters'])
-        #self.bn3 = nn.BatchNorm2d(256)
+        # self.bn2 = nn.BatchNorm2d(128,eps = 1)
+        self.conva3 = nn.Conv2d(128, 256, config['num_filters'])
+        # self.bn3 = nn.BatchNorm2d(256,eps = 1)
         self.conva4 = nn.Conv2d(256, 512, config['num_filters_FC'])
-        #self.bn4 = nn.BatchNorm2d(512)
+        # self.bn4 = nn.BatchNorm2d(512,eps = 1)
         # Last Layers
+        self.upSam = nn.Upsample(scale_factor=2, mode='bilinear')
 
         self.convd1 = nn.Conv2d(512, 512, config['num_filters_FC'])
-        #self.bn5 = nn.BatchNorm2d(512)
-        self.convd2 = nn.Conv2d(512, 1,config['num_filters_FC'])
+        # self.bn5 = nn.BatchNorm2d(512,eps = 1)
+        self.convd2 = nn.Conv2d(512, 1, config['num_filters_FC'])
 
     def forward(self, x):
         img_xformer = torchvision.transforms.Resize((x.shape[2] * 3, x.shape[3] * 3))
@@ -417,24 +413,112 @@ class ModelBasedOnPaperGitHubVersionSINGLEBRANCH(nn.Module):
         # img_xformer2 = torchvision.transforms.Resize((x.shape[2] // 4, x.shape[3] // 4))
         x = self.conva1(x)
         x = F.relu(x)
-
-
+        # x = self.bn1(x)
         x = self.poola(x)
+
         x = self.conva2(x)
         x = F.relu(x)
-
-
+        # x = self.bn2(x)
         x = self.poola1(x)
+
         x = self.conva3(x)
         x = F.relu(x)
-
+        # x = self.bn3(x)
 
         x = self.conva4(x)
+
         x = F.relu(x)
+        # x = self.bn4(x)
 
-
+        x = self.upSam(x)
         x = self.convd1(x)
         x = F.relu(x)
+        # x = self.bn5(x)
+
+        x = self.convd2(x)
+
+        finalXformer = torchvision.transforms.Resize((60, 60))
+        x = finalXformer(x)
+
+        return x
+
+
+class SingleBranchHpLp(nn.Module):
+
+    def __init__(self, config):
+        super(SingleBranchHpLp, self).__init__()
+        # Computational Graph Version
+        # original filters, 5 5 5 9 9 9
+        # changed filters, 3 3 3 5 5 5
+
+        self.conva1 = nn.Conv2d(1, 64, config['num_filters'])
+        self.poola = nn.MaxPool2d(2, 2)
+        # self.bn1 = nn.BatchNorm2d(64,eps = 1)
+        self.conva2 = nn.Conv2d(64, 128, config['num_filters'])
+        self.poola1 = nn.MaxPool2d(2, 2)
+        # self.bn2 = nn.BatchNorm2d(128,eps = 1)
+        self.conva3 = nn.Conv2d(128, 256, config['num_filters'])
+        # self.bn3 = nn.BatchNorm2d(256,eps = 1)
+        # self.conva4 = nn.Conv2d(256, 512, config['num_filters_FC'])
+        # self.bn4 = nn.BatchNorm2d(512,eps = 1)
+
+        self.convb1 = nn.Conv2d(1, 64, config['num_filters'])
+        self.poolb = nn.MaxPool2d(2, 2)
+        # self.bn1 = nn.BatchNorm2d(64,eps = 1)
+        self.convb2 = nn.Conv2d(64, 128, config['num_filters'])
+        self.poolb1 = nn.MaxPool2d(2, 2)
+        # self.bn2 = nn.BatchNorm2d(128,eps = 1)
+        self.convb3 = nn.Conv2d(128, 256, config['num_filters'])
+        # self.bn3 = nn.BatchNorm2d(256,eps = 1)
+
+        # self.convb4 = nn.Conv2d(256, 512, config['num_filters_FC'])
+        # self.bn4 = nn.BatchNorm2d(512,eps = 1)
+        # Last Layers
+        self.upSam = nn.Upsample(scale_factor=2, mode='bilinear')
+
+        self.convd1 = nn.Conv2d(512, 512, config['num_filters_FC'])
+        # self.bn5 = nn.BatchNorm2d(512,eps = 1)
+        self.convd2 = nn.Conv2d(512, 1, config['num_filters_FC'])
+
+    def forward(self, x):
+        img_xformer = torchvision.transforms.Resize((x.shape[3] * 3, x.shape[4] * 3))
+        x1 = img_xformer(x[:, :, 0, :, :])
+        x2 = img_xformer(x[:, :, 1, :, :])
+        x = None
+        # img_xformer2 = torchvision.transforms.Resize((x.shape[2] // 4, x.shape[3] // 4))
+
+        # HighPass
+        x1 = self.conva1(x1)
+        x1 = F.relu(x1)
+        x1 = self.poola(x1)
+
+        x1 = self.conva2(x1)
+        x1 = F.relu(x1)
+        x1 = self.poola1(x1)
+
+        x1 = self.conva3(x1)
+        x1 = F.relu(x1)
+
+        # lowpass
+        x2 = self.convb1(x2)
+        x2 = F.relu(x2)
+        x2 = self.poolb(x2)
+
+        x2 = self.convb2(x2)
+        x2 = F.relu(x2)
+        x2 = self.poolb1(x2)
+
+        x2 = self.convb3(x2)
+        x2 = F.relu(x2)
+
+        # recombine
+
+        x = torch.cat((x1, x2), dim=1)
+
+        x = self.upSam(x)
+        x = self.convd1(x)
+        x = F.relu(x)
+        # x = self.bn5(x)
 
         x = self.convd2(x)
 
@@ -661,10 +745,45 @@ def save_checkpoint(state, is_best, filename="checkpoint.pth.tar"):
         shutil.copyfile(filename, "checkpoint_best_loss.pth.tar")
 
 
+def create_images(TensorImg, nameOfFile):
+    subplotValue = ceil(sqrt(TensorImg.shape[0]))
+    fig1, axs = plt.subplots(subplotValue, subplotValue, figsize=(30, 30))
+    startx = 0
+    starty = 0
+
+    for x in range(TensorImg.shape[0]):
+        img = np.asarray(TensorImg[x, :, :, :].detach().cpu()).squeeze(0)
+        axs[startx, starty].imshow(img)
+        if starty % (subplotValue - 1) == 0 and starty != 0:
+            starty = 0
+            startx = startx + 1
+        else:
+            starty = starty + 1
+    plt.tight_layout()
+    plt.savefig(str(nameOfFile))
+
+
+def create_feature_images(TensorImg, nameOfFile):
+    subplotValue = ceil(sqrt(TensorImg.shape[1]))
+    fig1, axs = plt.subplots(subplotValue, subplotValue, figsize=(30, 30))
+    startx = 0
+    starty = 0
+
+    for x in range(TensorImg.shape[1]):
+        img = np.asarray(TensorImg[0, x, :, :].detach().cpu())
+        axs[startx, starty].imshow(img)
+        if starty % (subplotValue - 1) == 0 and starty != 0:
+            starty = 0
+            startx = startx + 1
+        else:
+            starty = starty + 1
+    plt.tight_layout()
+    plt.savefig(str(nameOfFile))
+
 
 def main(network, config=None):
     train_loader, test_loader, train_dataset, _ = load_data(
-        DATASET_TO_SPLIT_NORMALIZED, config['batch_size'], KEYS_USED, BAD_KEYS)
+        DATASET_TO_SPLIT_NORMALIZED, config['batch_size'], KEYS_USED, BAD_KEYS, network)
 
     if network == 'SphericalModel':
         model = SphericalModelDeep()
@@ -685,6 +804,8 @@ def main(network, config=None):
         model.model.layer3.requires_grad_(False)
     elif network == 'GithubBasedPaperSingleBranch':
         model = ModelBasedOnPaperGitHubVersionSINGLEBRANCH(config)
+    elif network == 'SingleBranchHpLp':
+        model = SingleBranchHpLp(config)
 
 
 
@@ -695,12 +816,14 @@ def main(network, config=None):
     print("#params", sum(x.numel() for x in model.parameters()))
 
     criterion = nn.MSELoss()
+    # criterion =nn.CrossEntropyLoss()
     criterion = criterion.to(DEVICE)
 
     # optimizer = torch.optim.Adam(
     #    model.parameters(),
     #    lr=LEARNING_RATE)
-    optimizer = torch.optim.SGD(model.parameters(), lr=config['learning_rate'], nesterov=True, momentum=config['momentum'])
+    optimizer = torch.optim.SGD(model.parameters(), lr=config['learning_rate'], nesterov=True,
+                                momentum=config['momentum'])
     lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min')
     last_epoch = 0
     if LOAD_CHECKPOINT == True:
@@ -712,12 +835,13 @@ def main(network, config=None):
         lr_scheduler.load_state_dict(checkpoint["lr_scheduler"])
         checkpoint = None  # Free up GPU memory
 
-    time.sleep(10)
+    # time.sleep(2)
 
     best_loss = float("inf")
     for epoch in range(last_epoch, config['epochs']):
 
         for i, (images, labels) in enumerate(train_loader):
+            # break
             model.train()
 
             images = images.to(DEVICE)
@@ -781,31 +905,26 @@ def main(network, config=None):
         # print('Test Accuracy: {0}'.format(100 * correct / total))
 
 
-
-
-
-
 LOAD_CHECKPOINT = True
-CHECKPOINT_PATH = r'D:/Thesis/ThesisCode_Models/Model1/2_2_singleBatch_E159/checkpoint_best_loss.pth.tar'
+CHECKPOINT_PATH = r'/mnt/d/Thesis/ThesisCode_Models/Model1/SphericalModel_maxpool/checkpoint_best_loss.pth.tar'
 
 CONFIG = {
-    'batch_size': 32,
+    'batch_size': 4,
     'epochs': 10000,
-    'num_filters': 2,
-    'num_filters_FC': 2,
+    'num_filters': 5,
+    'num_filters_FC': 5,
     'momentum': 0.9,
-    'learning_rate':5e-3
+    'learning_rate': 5e-3
 
 }
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--network",
                         help="network architecture to use",
-                        default='GithubBasedPaperSingleBranch',
+                        default='SphericalModel',
                         choices=['SphericalModel', 'PaperBased', 'ShallowPaper', 'GithubBasedPaper', 'ResNetBased',
-                                 'GithubBasedPaperSingleBranch'])
+                                 'GithubBasedPaperSingleBranch', 'SingleBranchHpLp'])
     parser.add_argument("--HSweep",
                         help="To sweep or not",
                         default='NoSweep',
@@ -815,8 +934,9 @@ if __name__ == '__main__':
 
 
     def train_function():
-        with wandb.init(project ='HyperParametersSingleBranch',config = CONFIG, entity = 'kryptixone'):
+        with wandb.init(project='SingleBranchSpherical', config=CONFIG, entity='kryptixone'):
             main(args.network, wandb.config)
+
 
     if args.HSweep == 'Sweep':
 
@@ -826,12 +946,12 @@ if __name__ == '__main__':
         SWEEP_CONFIG['metric'] = metric
 
         parameters_dict = {
-            'num_filters': {'values': [1,2,3,4, 5]},
-            'num_filters_FC': {'values': [1,2,3,4,5,6,7, 8, 9]},
-            #'learning_rate': {'distribution': 'uniform',
+            'num_filters': {'values': [1, 2, 3, 4, 5]},
+            'num_filters_FC': {'values': [1, 2, 3, 4, 5, 6, 7, 8, 9]},
+            # 'learning_rate': {'distribution': 'uniform',
             #                  'min': 0,
             #                  'max': 0.05},
-            'learning_rate': {'value':5e-3},
+            'learning_rate': {'value': 5e-3},
             'momentum': {'value': 0.9}
         }
         SWEEP_CONFIG['parameters'] = parameters_dict

@@ -29,6 +29,31 @@ def so3_integrate(x):
     return x
 
 
+def so3_integrate_only_gamma(x):
+    """
+    Integrate a signal on SO(3) using the Haar measure
+
+    :param x: [..., beta, alpha, gamma] (..., 2b, 2b, 2b)
+    :return y: [...] (...)
+    """
+    assert x.size(-1) == x.size(-2)
+    assert x.size(-2) == x.size(-3)
+
+    b = x.size(-1) // 2
+
+    w = _setup_so3_integrate(b, device_type=x.device.type, device_index=x.device.index)  # [beta]
+
+    #x = torch.sum(x, dim=-1)  # [..., beta, alpha]
+    #x = torch.sum(x, dim=-1).squeeze(-1)  # [..., beta]
+
+    sz = x.size()
+    x = x.view(-1, 2 * b)
+    w = w.view(2 * b, 1)
+    x = torch.mm(x, w).squeeze(-1)
+    x = x.view(*sz[:-1])
+    return x
+
+
 @lru_cache(maxsize=32)
 @show_running
 def _setup_so3_integrate(b, device_type, device_index):

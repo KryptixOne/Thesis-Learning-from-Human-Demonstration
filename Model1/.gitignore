@@ -8,4 +8,9 @@ CheckpointEpoch16
 DataToPreSplit
 2_2_singleBatch_E159
 3_3_singleBranch
+5_5_singleBranch
+SingleBranchHpLp
 wandb
+SphericalModel_maxpool
+SphericalModel_so3
+TrainProgressPhotos
