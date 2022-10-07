@@ -1,7 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="PYTHON_MODULE" version="4">
   <component name="NewModuleRootManager">
-    <content url="file://$MODULE_DIR$" />
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/Model1/DataToPreSplit_High_res" />
+      <excludeFolder url="file://$MODULE_DIR$/Model1/GitbasedpaperWithHalfQuarterResolution" />
+      <excludeFolder url="file://$MODULE_DIR$/Model1/DataToPreSplit_GMM_BWHigh" />
+      <excludeFolder url="file://$MODULE_DIR$/Model1/DataForTraining_GMMKDEBandwidthwas0.8" />
+      <excludeFolder url="file://$MODULE_DIR$/Model1/FirstModelThatWorked" />
+      <excludeFolder url="file://$MODULE_DIR$/Model1/Gradboost" />
+      <excludeFolder url="file://$MODULE_DIR$/Model1/NewDataModelInfo" />
+      <excludeFolder url="file://$MODULE_DIR$/Model1/SingleBranchHpLp" />
+      <excludeFolder url="file://$MODULE_DIR$/Model1/SphericalModel_maxpool" />
+      <excludeFolder url="file://$MODULE_DIR$/Model1/TrainData_6000_Pos_Depth" />
+      <excludeFolder url="file://$MODULE_DIR$/Model1/TrainData_6000_Pos_Depth_GMM_BWHigh" />
+      <excludeFolder url="file://$MODULE_DIR$/Model1/TrainData_6000_Pos_Depth_High_res" />
+      <excludeFolder url="file://$MODULE_DIR$/Model1/TrainProgressPhotos" />
+      <excludeFolder url="file://$MODULE_DIR$/Model1/DataWithOrientationHM_normalized" />
+      <excludeFolder url="file://$MODULE_DIR$/Model1/DataToPreSplit" />
+      <excludeFolder url="file://$MODULE_DIR$/Model1/5_5_singleBranch_featuremappic" />
+    </content>
     <orderEntry type="jdk" jdkName="3.8 @ Ubuntu" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
