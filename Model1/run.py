@@ -58,6 +58,7 @@ class FolderData(Dataset):
             raise RuntimeError(f'Invalid directory "{path}"')
 
         self.samples = []
+        #get all item directories
         for e in path.iterdir():
             tempsamp = [f for f in e.iterdir() if f.is_file()]
             if train_testFlag == 'train':  # even distribution of training data
@@ -917,7 +918,7 @@ def create_feature_images(TensorImg, nameOfFile):
 
 def load_data(path, batch_size, keys_path=None, bad_keys_path=None, network=None):
     pre_split_available = True
-    data_not_formatted = False
+    data_not_formatted = True
     start_training = True
     use_residuals = False
     use_single_file_as_dataset = False
@@ -1364,6 +1365,7 @@ def load_data(path, batch_size, keys_path=None, bad_keys_path=None, network=None
                         except:
                             if isnan(np.amax(currThetaAngle)):
                                 currThetaAngle = np.zeros_like(currThetaAngle)
+                                print(str(item)[:-3])
 
                     if np.any(np.isnan(currThetaHm)) == True:
                         try:
@@ -1373,6 +1375,7 @@ def load_data(path, batch_size, keys_path=None, bad_keys_path=None, network=None
                         except:
                             if isnan(np.amax(currThetaHm)):
                                 currThetaHm = np.zeros_like(currThetaHm)
+                                print(str(item)[:-3])
 
                     if np.any(np.isnan(currPhiAngle)) == True:
                         try:
@@ -1382,6 +1385,7 @@ def load_data(path, batch_size, keys_path=None, bad_keys_path=None, network=None
                         except:
                             if isnan(np.amax(currPhiAngle)):
                                 currPhiAngle = np.zeros_like(currPhiAngle)
+                                print(str(item)[:-3])
 
                     if np.any(np.isnan(currPhiHm)) == True:
                         try:
@@ -1391,6 +1395,7 @@ def load_data(path, batch_size, keys_path=None, bad_keys_path=None, network=None
                         except:
                             if isnan(np.amax(currPhiHm)):
                                 currPhiHm = np.zeros_like(currPhiHm)
+                                print(str(item)[:-3])
 
                     if np.any(np.isnan(currGammaAngle)) == True:
                         try:
@@ -1400,6 +1405,7 @@ def load_data(path, batch_size, keys_path=None, bad_keys_path=None, network=None
                         except:
                             if isnan(np.amax(currGammaAngle)):
                                 currGammaAngle = np.zeros_like(currGammaAngle)
+                                print(str(item)[:-3])
 
                     if np.any(np.isnan(CurrGammaHm)) == True:
                         try:
@@ -1409,6 +1415,7 @@ def load_data(path, batch_size, keys_path=None, bad_keys_path=None, network=None
                         except:
                             if isnan(np.amax(CurrGammaHm)):
                                 CurrGammaHm = np.zeros_like(CurrGammaHm)
+                                print(str(item)[:-3])
 
                     # if x == 0:
                     depthimages = currdepth
