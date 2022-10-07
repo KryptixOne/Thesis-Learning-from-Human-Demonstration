@@ -40,7 +40,7 @@ def create_images(TensorImg, nameOfFile, ManualSubplotValue=None):
             else:
                 starty = starty + 1
     plt.tight_layout()
-    plt.savefig(r'/mnt/d/Thesis/ThesisCode_Models/Model1/MODEL2/CreatedImagesFromScript/'+str(nameOfFile))
+    plt.savefig(r'/mnt/d/Thesis/ThesisCode_Models/ModelPart2/CreatedImagesFromScript/'+str(nameOfFile))
 
 
 def create_feature_images(TensorImg, nameOfFile):

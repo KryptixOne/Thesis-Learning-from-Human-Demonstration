@@ -1,10 +1,3 @@
-# !/usr/bin/env python3
-
-"""
-Trains a 3 layer MLP with MAML on Sine Wave Regression Dataset.
-We use the Sine Wave dataloader from the torchmeta package.
-Torchmeta: https://github.com/tristandeleu/pytorch-meta
-"""
 
 import random
 import argparse
@@ -18,9 +11,9 @@ from torch.utils.data import Dataset
 import torchvision.transforms
 import shutil
 
-from MODEL2.Models.ModelsPart2 import RBranchEarlyExit
-from MODEL2.Dataloader.FolderDataLoader import FolderData
-from MODEL2.ImageFunctions.ImageCreationFunctions import create_images
+from Models.ModelsPart2 import RBranchEarlyExit
+from Dataloader.FolderDataLoader import FolderData
+from ImageFunctions.ImageCreationFunctions import create_images
 
 
 
@@ -300,7 +293,7 @@ def main(
     loss = customLoss_7Channel()
     trainbest_loss = float("inf")
     valbest_loss = float("inf")
-    CHECKPOINT_PATH = r'/mnt/d/Thesis/ThesisCode_Models/Model1/MODEL2/PostFurkanLoss/Post_Furkan_chat_DualLoss_Best_DeepNet_checkpoint.pth.tar'
+    CHECKPOINT_PATH = r'/mnt/d/Thesis/ThesisCode_Models/ModelPart2/Results/PostFurkanLoss/Post_Furkan_chat_DualLoss_Best_DeepNet_checkpoint.pth.tar'
     if load_checkpoint == True:
         print('loading checkpoint from ' + CHECKPOINT_PATH)
         checkpoint = torch.load(CHECKPOINT_PATH, map_location=device)
@@ -466,10 +459,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print('loading data')
 
-    DataPathTrain = r'/mnt/d/Thesis/ThesisCode_Models/Model1/DataWithOrientationHM_normalized/Data/Train'
-    DataPathVal = r'/mnt/d/Thesis/ThesisCode_Models/Model1/DataWithOrientationHM_normalized/Data/Val'
-    DataPathTestadapt = r'/mnt/d/Thesis/ThesisCode_Models/Model1/DataWithOrientationHM_normalized/Data/TestAdapt'
-    DataPathTesttest = r'/mnt/d/Thesis/ThesisCode_Models/Model1/DataWithOrientationHM_normalized/Data/TestTest'
+    DataPathTrain = r'/mnt/d/Thesis/ThesisCode_Models/DataWithOrientationHM_normalized/Data/Train'
+    DataPathVal = r'/mnt/d/Thesis/ThesisCode_Models/DataWithOrientationHM_normalized/Data/Val'
+    DataPathTestadapt = r'/mnt/d/Thesis/ThesisCode_Models/DataWithOrientationHM_normalized/Data/TestAdapt'
+    DataPathTesttest = r'/mnt/d/Thesis/ThesisCode_Models/DataWithOrientationHM_normalized/Data/TestTest'
     traintasksets = FolderData(DataPathTrain, ModelSelect='Part2', Singleimg=False, AddNoise=False)
     trainloader = torch.utils.data.DataLoader(traintasksets, batch_size=CONFIG['batch_size'])
 
