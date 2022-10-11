@@ -3,3 +3,4 @@ CreatedImagesFromScript
 
 AugmentedData_RandomPoints_checkpoint.pth.tar
 checkpoint_best_loss.pth.tar
+wandb

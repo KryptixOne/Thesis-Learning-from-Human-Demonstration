@@ -1,4 +1,3 @@
-
 import random
 import argparse
 import numpy as np
@@ -14,8 +13,6 @@ import shutil
 from Models.ModelsPart2 import RBranchEarlyExit
 from Dataloader.FolderDataLoader import FolderData
 from ImageFunctions.ImageCreationFunctions import create_images
-
-
 
 VAL1SAME = 0
 VAL2SAME = 0
@@ -35,6 +32,41 @@ CONFIG = {
     'dropout': 0.8
 
 }
+
+
+class customLoss_7Channel(nn.Module):
+    def __init__(self, weight=None, size_average=True):
+        super(customLoss_7Channel, self).__init__()
+
+    def forward(self, inputTensor, TargetTensor, ):
+        TensorAnglesThetaPhi = inputTensor[:, 0:2, :, :]
+        TensorAnglesGamma = inputTensor[:, 2, :, :]
+        TensorHMs = inputTensor[:, 3, :, :]
+        TargetAnglesThetaPhi = TargetTensor[:, 0:2, :, :]
+        TargetAnglesGamma = TargetTensor[:, 2, :, :]
+        """
+        a = TensorAngles > np.pi / 2
+        b = TargetAngles < np.pi / 2
+        mapping = torch.logical_and(a, b)
+        TensorAngles[mapping] = TensorAngles[mapping] + np.pi
+        """
+        critMSE = nn.MSELoss(reduction='mean')
+        lossMSE = critMSE(TensorHMs, TargetTensor[:, 3, :, :])
+
+        lossAngularThetaPhi = ((2 - (
+                2 * torch.cos(TensorAnglesThetaPhi - TargetTensor[:, 0:2, :, :]))).sum()) / (
+                                  torch.numel(TensorAnglesThetaPhi))  # input should be in radians
+
+        lossAngularGamma = ((2 - 2 * torch.square(
+            torch.cos(TensorAnglesGamma - TargetTensor[:, 2, :, :]))).sum()) / (
+                               torch.numel(TensorAnglesGamma))  # input should be in radians
+        # critnew = nn.L1Loss()
+        # lossMSEAngular =  critnew(TensorAngles, TargetTensor[:, 0:3, :, :])
+        loss = lossMSE + (1 / 3) * lossAngularGamma + (2 / 3) * lossAngularThetaPhi  # post Furkan Loss
+        # loss = lossMSE + lossAngularGamma + 2*lossAngularThetaPhi  #post Furkan Loss
+
+        return loss
+
 
 def AugmentTasks(labels, NoiseToRegressionTargetAngles=False, LikelihoodsUpdates=False, UseSameNoise=False,
                  ChooseRandomPoints=False, NumRandomPoints=None):
@@ -184,7 +216,7 @@ def AugmentTasks(labels, NoiseToRegressionTargetAngles=False, LikelihoodsUpdates
     return augmentedLabels
 
 
-def fast_adapt(batch, learner, loss, adaptation_steps, shots, ways, device,
+def fast_adapt(batch, learner, loss, adaptation_steps, device,
                NoiseToTarget=False, LikelihoodUpdate=False, UseSameNoise=False, ChooseRandomPoints=False):
     data, labels = batch
     labels = AugmentTasks(labels, NoiseToRegressionTargetAngles=NoiseToTarget, LikelihoodsUpdates=LikelihoodUpdate,
@@ -217,7 +249,7 @@ def fast_adapt(batch, learner, loss, adaptation_steps, shots, ways, device,
     # valid_error = loss(predictions, evaluation_labels)
     # print(valid_error)
 
-    return train_error  # , valid_accuracy
+    return train_error, predictions, evaluation_labels  # , valid_accuracy
 
 
 def save_checkpoint(state, is_best, filename="checkpoint.pth.tar"):
@@ -226,45 +258,9 @@ def save_checkpoint(state, is_best, filename="checkpoint.pth.tar"):
         shutil.copyfile(filename, "checkpoint_best_loss.pth.tar")
 
 
-class customLoss_7Channel(nn.Module):
-    def __init__(self, weight=None, size_average=True):
-        super(customLoss_7Channel, self).__init__()
-
-    def forward(self, inputTensor, TargetTensor, ):
-        TensorAnglesThetaPhi = inputTensor[:, 0:2, :, :]
-        TensorAnglesGamma = inputTensor[:, 2, :, :]
-        TensorHMs = inputTensor[:, 3, :, :]
-        TargetAnglesThetaPhi = TargetTensor[:, 0:2, :, :]
-        TargetAnglesGamma = TargetTensor[:, 2, :, :]
-        """
-        a = TensorAngles > np.pi / 2
-        b = TargetAngles < np.pi / 2
-        mapping = torch.logical_and(a, b)
-        TensorAngles[mapping] = TensorAngles[mapping] + np.pi
-        """
-        critMSE = nn.MSELoss(reduction='mean')
-        lossMSE = critMSE(TensorHMs, TargetTensor[:, 3, :, :])
-
-        lossAngularThetaPhi = ((2 - (
-                2 * torch.cos(TensorAnglesThetaPhi - TargetTensor[:, 0:2, :, :]))).sum()) / (
-                                  torch.numel(TensorAnglesThetaPhi))  # input should be in radians
-
-        lossAngularGamma = ((2 - 2 * torch.square(
-            torch.cos(TensorAnglesGamma - TargetTensor[:, 2, :, :]))).sum()) / (
-                               torch.numel(TensorAnglesGamma))  # input should be in radians
-        # critnew = nn.L1Loss()
-        # lossMSEAngular =  critnew(TensorAngles, TargetTensor[:, 0:3, :, :])
-        loss = lossMSE + (1 / 3) * lossAngularGamma + (2 / 3) * lossAngularThetaPhi  # post Furkan Loss
-        # loss = lossMSE + lossAngularGamma + 2*lossAngularThetaPhi  #post Furkan Loss
-
-        return loss
-
-
 def main(
         config=None, trainloader=None, valloader=None, testloader=None, testtestloader=None
 ):
-    shots = 20
-    ways = 1
     meta_batch_size = int(config['meta_batch_size'])  # since total of 15 objects per category/ task object
     batch_size = int(config['batch_size'])  # 6 per object, so 5 objects
     adapt_lr = config['adapt_lr']
@@ -273,7 +269,7 @@ def main(
     test_steps = 10
     seed = 42
     Create_checkpoint = True
-    load_checkpoint = False
+    load_checkpoint = True
     testing = False
 
     random.seed(seed)
@@ -293,7 +289,7 @@ def main(
     loss = customLoss_7Channel()
     trainbest_loss = float("inf")
     valbest_loss = float("inf")
-    CHECKPOINT_PATH = r'/mnt/d/Thesis/ThesisCode_Models/ModelPart2/Results/PostFurkanLoss/Post_Furkan_chat_DualLoss_Best_DeepNet_checkpoint.pth.tar'
+    CHECKPOINT_PATH = r'/mnt/d/Thesis/ThesisCode_Models/ModelPart2/AugmentedData_RandomPoints_checkpoint.pth.tar'
     if load_checkpoint == True:
         print('loading checkpoint from ' + CHECKPOINT_PATH)
         checkpoint = torch.load(CHECKPOINT_PATH, map_location=device)
@@ -330,15 +326,13 @@ def main(
                     # Compute meta-testing loss
                     learner = maml.clone()
 
-                    evaluation_error = fast_adapt(batch,
-                                                  learner,
-                                                  loss,
-                                                  test_steps,
-                                                  shots,
-                                                  ways,
-                                                  device,
-                                                  NoiseToTarget=False, LikelihoodUpdate=False
-                                                  )
+                    evaluation_error, predicted, evalLabels = fast_adapt(batch,
+                                                                         learner,
+                                                                         loss,
+                                                                         test_steps,
+                                                                         device,
+                                                                         NoiseToTarget=False, LikelihoodUpdate=False
+                                                                         )
                     meta_test_error += evaluation_error.item()
                     # meta_test_accuracy += evaluation_accuracy.item()
                 print('Meta Test Error', meta_test_error / test_size)
@@ -350,14 +344,12 @@ def main(
 
                 learner = maml.clone()
 
-                evaluation_error = fast_adapt(batch,
-                                              learner,
-                                              loss,
-                                              test_steps,
-                                              shots,
-                                              ways,
-                                              device,
-                                              LikelihoodUpdate=False, UseSameNoise=False)
+                evaluation_error, predicted, evalLabels = fast_adapt(batch,
+                                                                     learner,
+                                                                     loss,
+                                                                     test_steps,
+                                                                     device,
+                                                                     LikelihoodUpdate=False, UseSameNoise=False)
                 meta_testtest_error += evaluation_error.item()
                 print(meta_testtest_error)
                 # print('Meta Test Accuracy', meta_test_accuracy / meta_batch_size)
@@ -374,14 +366,13 @@ def main(
                 train_iter = iter(trainloader)
                 batch = next(train_iter)
 
-            evaluation_error = fast_adapt(batch,
-                                          learner,
-                                          loss,
-                                          adaptation_steps,
-                                          shots,
-                                          ways,
-                                          device, NoiseToTarget=True, LikelihoodUpdate=False, ChooseRandomPoints=True
-                                          )
+            evaluation_error, predicted, evalLabels = fast_adapt(batch,
+                                                                 learner,
+                                                                 loss,
+                                                                 adaptation_steps,
+                                                                 device, NoiseToTarget=True, LikelihoodUpdate=False,
+                                                                 ChooseRandomPoints=True
+                                                                 )
 
             evaluation_error.backward()
             meta_train_error += evaluation_error.item()
@@ -397,14 +388,13 @@ def main(
                 val_iter = iter(valloader)
                 batch = next(val_iter)
 
-            evaluation_error = fast_adapt(batch,
-                                          learner,
-                                          loss,
-                                          adaptation_steps,
-                                          shots,
-                                          ways,
-                                          device, NoiseToTarget=True, LikelihoodUpdate=False, ChooseRandomPoints=True
-                                          )
+            evaluation_error, predicted, evalLabels = fast_adapt(batch,
+                                                                 learner,
+                                                                 loss,
+                                                                 adaptation_steps,
+                                                                 device, NoiseToTarget=True, LikelihoodUpdate=False,
+                                                                 ChooseRandomPoints=True
+                                                                 )
 
             meta_valid_error += evaluation_error.item()
 
@@ -432,7 +422,7 @@ def main(
         #               "Train_loss": (meta_train_error / meta_batch_size)})
 
         # Optional
-        wandb.watch(model)
+        # wandb.watch(model)
         if Create_checkpoint == True:
             save_checkpoint(
                 {
@@ -443,9 +433,8 @@ def main(
                     'trainloss': trainbest_loss,
                     "optimizer": opt.state_dict(),
                 },
-                is_best, filename=" AugmentedData_RandomPoints_checkpoint.pth.tar"
+                is_best, filename="AugmentedData_RandomPoints_checkpoint.pth.tar"
             )
-
 
 
 if __name__ == '__main__':

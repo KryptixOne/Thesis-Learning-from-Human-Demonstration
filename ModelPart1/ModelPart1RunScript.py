@@ -92,12 +92,13 @@ def create_feature_images(TensorImg, nameOfFile):
 def load_data(path, batch_size, keys_path=None, bad_keys_path=None, network=None):
     pre_split_available = True
     data_not_formatted = True
-    start_training = True
+    start_training = False
     use_residuals = False
     use_single_file_as_dataset = False
     use_FolderData = True
-    path_of_individual_items_not_normalized = r'/mnt/d/Thesis/Thesis Code/Data_Created/DataWithOrientationHM/grasps'
-    path_of_individual_items_normalized = r'/mnt/d/Thesis/ThesisCode_Models/Model1/DataWithOrientationHM_normalized/Data'
+    # path_of_individual_items_not_normalized = r'/mnt/d/Thesis/Thesis Code/Data_Created/DataWithOrientationHM/grasps'
+    path_of_individual_items_not_normalized = r'/mnt/d/Thesis/HumanDemonstrated/HumanDemonstrated_withKDE/Pouring'
+    path_of_individual_items_normalized = r'/mnt/d/Thesis/HumanDemonstrated/HumanDemonstrated_Normalized/Pouring'
 
     # run After Data_not formatted
     # dataset_To_prepsplit
@@ -449,6 +450,8 @@ def load_data(path, batch_size, keys_path=None, bad_keys_path=None, network=None
 
                 # data_dict = {'depthImages':depthimages, 'positionHeatMap': posHeatMap}
         else:
+            # get category names:
+            create_categories = False
             # get all files in directory.
 
             keylist = [f for f in listdir(path_of_individual_items_not_normalized) if
@@ -456,9 +459,6 @@ def load_data(path, batch_size, keys_path=None, bad_keys_path=None, network=None
             keys_used = []
             bad_keys = []
             k = 0
-
-            # get category names:
-            create_categories = True
 
             onlyfiles = [f.split('_')[0] for f in listdir(path_of_individual_items_not_normalized) if
                          isfile(join(path_of_individual_items_not_normalized, f))]
@@ -486,7 +486,7 @@ def load_data(path, batch_size, keys_path=None, bad_keys_path=None, network=None
             for item in keylist:
                 with open(join(path_of_individual_items_not_normalized, item), 'rb') as f:
                     dataset = pickle.load(f)
-                for x in range(6):
+                for x in range(dataset.shape[0]):
                     currobj = dataset[x, :, :, :]
                     currdepth = currobj[None, 0, :, :]
                     currPosHeatMap = currobj[None, 5, :, :]
@@ -624,24 +624,32 @@ def load_data(path, batch_size, keys_path=None, bad_keys_path=None, network=None
                                  'GammaAngle': GammaAngle,
                                  'GammaHm': GammaHm
                                  }
-                    if str(item).split('_')[0] in list(train_categories.keys()):
-                        with open(
-                                r'/mnt/d/Thesis/ThesisCode_Models/Model1/DataWithOrientationHM_normalized/Data/Train/' +
-                                str(item).split('_')[0] + r'/' + str(item)[
-                                                                 :-7] + 'vers_' + str(x) + '.pickle',
-                                'wb') as handle:
-                            pickle.dump(data_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
-                    elif str(item).split('_')[0] in list(test_categories):
-                        with open(
-                                r'/mnt/d/Thesis/ThesisCode_Models/Model1/DataWithOrientationHM_normalized/Data/Test/' +
-                                str(item).split('_')[0] + r'/' + str(item)[
-                                                                 :-7] + 'vers_' + str(x) + '.pickle',
-                                'wb') as handle:
-                            pickle.dump(data_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
+                    if create_categories == True:
+                        if str(item).split('_')[0] in list(train_categories.keys()):
+                            with open(
+                                    r'/mnt/d/Thesis/ThesisCode_Models/Model1/DataWithOrientationHM_normalized/Data/Train/' +
+                                    str(item).split('_')[0] + r'/' + str(item)[
+                                                                     :-7] + 'vers_' + str(x) + '.pickle',
+                                    'wb') as handle:
+                                pickle.dump(data_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
+                        elif str(item).split('_')[0] in list(test_categories):
+                            with open(
+                                    r'/mnt/d/Thesis/ThesisCode_Models/Model1/DataWithOrientationHM_normalized/Data/Test/' +
+                                    str(item).split('_')[0] + r'/' + str(item)[
+                                                                     :-7] + 'vers_' + str(x) + '.pickle',
+                                    'wb') as handle:
+                                pickle.dump(data_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
+                        else:
+                            with open(
+                                    r'/mnt/d/Thesis/ThesisCode_Models/Model1/DataWithOrientationHM_normalized/Data/Val/' +
+                                    str(item).split('_')[0] + r'/' + str(item)[
+                                                                     :-7] + 'vers_' + str(x) + '.pickle',
+                                    'wb') as handle:
+                                pickle.dump(data_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
                     else:
                         with open(
-                                r'/mnt/d/Thesis/ThesisCode_Models/Model1/DataWithOrientationHM_normalized/Data/Val/' +
+                                r'/mnt/d/Thesis/HumanDemonstrated/HumanDemonstrated_Normalized/Pouring/' +
                                 str(item).split('_')[0] + r'/' + str(item)[
                                                                  :-7] + 'vers_' + str(x) + '.pickle',
                                 'wb') as handle:

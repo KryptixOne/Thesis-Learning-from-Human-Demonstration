@@ -74,3 +74,5 @@ def ImageSampler_SingleTask(inputImgTensor, block_size =10, num_subtasks=5,non_z
 
 #inputimg = torch.rand(2,60,60)
 #ImageSampler_SingleTask(inputImgTensor =inputimg)
+if __name__ == '__main__':
+    pass
