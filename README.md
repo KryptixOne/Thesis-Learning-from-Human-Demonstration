@@ -29,7 +29,7 @@ When training such a model with FOMAML , we found that the best form of task-aug
 adapting its predictions. When attempting task-augmentations on the labelled likelihood maps, the FOMAML trained model was not flexible enough. 
 
 
-<img src="https://github.com/KryptixOne/Thesis-Learning-from-Human-Demonstration/blob/main/Images/EffectOfNoiseOnMAML.PNG" width="800" />
+<img src="https://github.com/KryptixOne/Thesis-Learning-from-Human-Demonstration/blob/main/Images/EffectOfNoiseOnMAML.png" width="800" />
 
 ## Data Generator:
 For data Generation used for these models, see my other repository:
