@@ -30,6 +30,7 @@ adapting its predictions. When attempting task-augmentations on the labelled lik
 
 
 <img src="https://github.com/KryptixOne/Thesis-Learning-from-Human-Demonstration/blob/main/Images/EffectOfNoiseOnMAML.png" width="800" />
+a) the Labelled data for b) the predicted data
 
 ## Data Generator:
 For data Generation used for these models, see my other repository:
