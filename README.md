@@ -1,5 +1,8 @@
 # Robotic Task Learning From Human Demonstrations using Spherical Representations
 
+The repository at hand is designed into two modular DNNs such that they can ultimately be use used as in the following figure
+
+<img src="https://github.com/KryptixOne/Thesis-Learning-from-Human-Demonstration/blob/main/Images/Pipeline%20General.PNG" width="600" />
 
 
 ## Model Part I
@@ -8,7 +11,11 @@
 <img src="https://github.com/KryptixOne/Thesis-Learning-from-Human-Demonstration/blob/main/Images/FinalModelPartI.PNG" width="600" />
 
 Model Part 1 is the name given to the model used to determine the likelihood maps asssociated with the probability
-of the absolute position of a grasp occuring. This is predicted given a 2-D input of the spherically transformed mesh.
+of the absolute position of a grasp occuring. This prediction is given based off of an input 2-D image which was created via a hemispherical transform on a 3-D object mesh.
+
+Visual results of such predictions using Model Part I are as depicted:
+
+<img src="https://github.com/KryptixOne/Thesis-Learning-from-Human-Demonstration/blob/main/Images/FinalModelPart1_VisualResults.PNG" width="600" />
 
 ## Model Part II
 
