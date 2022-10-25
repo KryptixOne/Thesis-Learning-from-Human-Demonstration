@@ -1,6 +1,7 @@
 Results
 CreatedImagesFromScript
-
+AugmentedData_NoPositionMap_checkpoint.pth.tar
 AugmentedData_RandomPoints_checkpoint.pth.tar
+AugmentedData_RandomPoints_fromBegin_checkpoint.pth.tar
 checkpoint_best_loss.pth.tar
 wandb

@@ -499,8 +499,9 @@ class RBranchEarlyExit(nn.Module):
 
     def __init__(self, config=None):
         super(RBranchEarlyExit, self).__init__()
+        self.maskvalue = config['maskvalue']
 
-        self.conv13 = nn.Conv2d(2, 64, 5, padding=2)
+        self.conv13 = nn.Conv2d(2, 64, 5, padding=2) # 2 for pos map input. 1 for no pos map input
         self.sigma = config['gaussianSigma']
         self.bn1 = nn.BatchNorm2d(64)
         self.pool1 = nn.MaxPool2d(2, 2, return_indices=True)
@@ -638,6 +639,7 @@ class RBranchEarlyExit(nn.Module):
         x3 = self.conv_deconv1Hm(x3)
         x3 = self.sigmoid(x3)
         x3 = self.gaussian_filter1(x3)
+        #x3 = (1 / torch.amax(x3)) * x3
 
         x_gamma = self.conv_deconv1Gamma(x)
         x_gamma = self.sigmoid(x_gamma) * np.pi
@@ -647,7 +649,7 @@ class RBranchEarlyExit(nn.Module):
 
         x = torch.cat((x_Theta_phi, x_gamma), dim=1)
 
-        filterX3 = x3 < 0.2  # only areas with low probability selected
+        filterX3 = x3 < self.maskvalue  # only areas with low probability selected
 
         x0_temp = x[:, 0, :, :]
         x0_temp = x0_temp[:, None, :, :]
@@ -818,6 +820,7 @@ class HMToAngle(nn.Module):
         x = finalXformer(x)
 
         return x
+
 
 if __name__ == '__main__':
     pass

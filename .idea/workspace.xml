@@ -3,9 +3,13 @@
   <component name="ChangeListManager">
     <list default="true" id="7332ea9b-4bd4-48df-9136-8ecbc09ac964" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FullModel/FullModelRun.py" beforeDir="false" afterPath="$PROJECT_DIR$/FullModel/FullModelRun.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ModelPart1/ModelPart1RunScript.py" beforeDir="false" afterPath="$PROJECT_DIR$/ModelPart1/ModelPart1RunScript.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ModelPart2/ImageFunctions/Image_sampler.py" beforeDir="false" afterPath="$PROJECT_DIR$/ModelPart2/ImageFunctions/Image_sampler.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ModelPart1/Models/Models.py" beforeDir="false" afterPath="$PROJECT_DIR$/ModelPart1/Models/Models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ModelPart2/Dataloader/FolderDataLoader.py" beforeDir="false" afterPath="$PROJECT_DIR$/ModelPart2/Dataloader/FolderDataLoader.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ModelPart2/ImageFunctions/ImageCreationFunctions.py" beforeDir="false" afterPath="$PROJECT_DIR$/ModelPart2/ImageFunctions/ImageCreationFunctions.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ModelPart2/ModelPart2RunScript.py" beforeDir="false" afterPath="$PROJECT_DIR$/ModelPart2/ModelPart2RunScript.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ModelPart2/Models/ModelsPart2.py" beforeDir="false" afterPath="$PROJECT_DIR$/ModelPart2/Models/ModelsPart2.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,8 +64,8 @@
       <recent name="D:\Thesis\ThesisCode_Models\Model1\MODEL2\Models" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.ModelPart2RunScript (1)">
-    <configuration name="MAMLRunScript" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Python.MamlTrainPart1">
+    <configuration name="FullModelRun" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="ThesisCode_Models" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -69,12 +73,34 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Model1" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/FullModel" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Model1/MAMLRunScript.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/FullModel/FullModelRun.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="MamlTrainPart1" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="ThesisCode_Models" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ModelPart1" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ModelPart1/MamlTrainPart1.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -149,35 +175,13 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="learn2learnTest" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="ThesisCode_Models" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Model1" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Model1/learn2learnTest.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.MamlTrainPart1" />
+        <item itemvalue="Python.FullModelRun" />
         <item itemvalue="Python.ModelPart2RunScript (1)" />
         <item itemvalue="Python.ModelPart1RunScript" />
         <item itemvalue="Python.ModelPart2RunScript" />
-        <item itemvalue="Python.MAMLRunScript" />
-        <item itemvalue="Python.learn2learnTest" />
       </list>
     </recent_temporary>
   </component>
@@ -225,7 +229,9 @@
       <workItem from="1664285424570" duration="18045000" />
       <workItem from="1664375769628" duration="24749000" />
       <workItem from="1664620338133" duration="19374000" />
-      <workItem from="1664911945097" duration="64746000" />
+      <workItem from="1664911945097" duration="81583000" />
+      <workItem from="1665553706709" duration="15313000" />
+      <workItem from="1665999701155" duration="41055000" />
     </task>
     <servers />
   </component>
@@ -252,14 +258,59 @@
           <option name="timeStamp" value="478" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/ModelPart2/ModelPart2RunScript.py</url>
-          <line>328</line>
-          <option name="timeStamp" value="667" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/ModelPart1/ModelPart1RunScript.py</url>
           <line>675</line>
           <option name="timeStamp" value="676" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ModelPart1/ModelPart1RunScript.py</url>
+          <line>104</line>
+          <option name="timeStamp" value="716" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ModelPart1/ModelPart1RunScript.py</url>
+          <line>105</line>
+          <option name="timeStamp" value="717" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ModelPart1/ModelPart1RunScript.py</url>
+          <line>456</line>
+          <option name="timeStamp" value="721" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ModelPart1/ModelPart1RunScript.py</url>
+          <line>462</line>
+          <option name="timeStamp" value="722" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ModelPart1/ModelPart1RunScript.py</url>
+          <line>466</line>
+          <option name="timeStamp" value="723" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ModelPart2/ModelPart2RunScript.py</url>
+          <line>309</line>
+          <option name="timeStamp" value="771" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ModelPart2/ModelPart2RunScript.py</url>
+          <line>321</line>
+          <option name="timeStamp" value="772" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/ModelPart2/ModelPart2RunScript.py</url>
+          <line>368</line>
+          <option name="timeStamp" value="774" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/FullModel/FullModelRun.py</url>
+          <line>340</line>
+          <option name="timeStamp" value="775" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/FullModel/FullModelRun.py</url>
+          <line>329</line>
+          <option name="timeStamp" value="776" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -278,10 +329,12 @@
     </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/ThesisCode_Models$FullModelRun.coverage" NAME="FullModelRun Coverage Results" MODIFIED="1666356814648" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/FullModel" />
     <SUITE FILE_PATH="coverage/ThesisCode_Models$learn2learnTest.coverage" NAME="learn2learnTest Coverage Results" MODIFIED="1665131369686" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Model1" />
     <SUITE FILE_PATH="coverage/ThesisCode_Models$MAMLRunScript.coverage" NAME="MAMLRunScript Coverage Results" MODIFIED="1665132446971" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Model1" />
-    <SUITE FILE_PATH="coverage/ThesisCode_Models$ModelPart1RunScript.coverage" NAME="ModelPart1RunScript Coverage Results" MODIFIED="1665415397791" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ModelPart1" />
-    <SUITE FILE_PATH="coverage/ThesisCode_Models$ModelPart2RunScript__1_.coverage" NAME="ModelPart2RunScript (1) Coverage Results" MODIFIED="1665418964922" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ModelPart2" />
+    <SUITE FILE_PATH="coverage/ThesisCode_Models$MamlTrainPart1.coverage" NAME="MamlTrainPart1 Coverage Results" MODIFIED="1666432968924" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ModelPart1" />
+    <SUITE FILE_PATH="coverage/ThesisCode_Models$ModelPart1RunScript.coverage" NAME="ModelPart1RunScript Coverage Results" MODIFIED="1665492412059" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ModelPart1" />
+    <SUITE FILE_PATH="coverage/ThesisCode_Models$ModelPart2RunScript__1_.coverage" NAME="ModelPart2RunScript (1) Coverage Results" MODIFIED="1666089996048" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ModelPart2" />
     <SUITE FILE_PATH="coverage/ThesisCode_Models$run.coverage" NAME="run Coverage Results" MODIFIED="1661236256833" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Model1" />
     <SUITE FILE_PATH="coverage/ThesisCode_Models$ModelPart2RunScript.coverage" NAME="ModelPart2RunScript Coverage Results" MODIFIED="1665132941990" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Model1" />
     <SUITE FILE_PATH="coverage/ThesisCode_Models$Model1.coverage" NAME="Model1 Coverage Results" MODIFIED="1651841043265" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Model1" />

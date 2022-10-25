@@ -18,6 +18,7 @@ TrainProgressPhotos
 DataToPreSplit_High_res
 TrainData_6000_Pos_Depth_High_res
 cache
+CheckpointsToIgnore
 
 AugmentedData_RandomPoints_checkpoint.pth.tar
 checkpoint_best_loss.pth.tar

@@ -57,7 +57,8 @@ class FolderData(Dataset):
                 targetHM = torch.from_numpy(targetHM[:, :, :].astype(np.float32))
                 outputData = targetHM
 
-        else:  # ModelSelect == 'Part2' return Input Sppherical + Positional HM , Target Orientation HM
+
+        elif self.ModelSelect == 'Part2': #return Input Sppherical + Positional HM , Target Orientation HM
             with open(self.samples[index], 'rb') as f:
                 curdata = pickle.load(f)
 
@@ -107,6 +108,29 @@ class FolderData(Dataset):
                 # outputData = torch.cat((ThetaAng, ThetaHm), dim=0)
                 pass
             # outputData = torch.cat((ThetaAng, PhiAngle, GammaAngle), dim=0)
+
+        elif self.ModelSelect == 'Full':
+            with open(self.samples[index], 'rb') as f:
+                curdata = pickle.load(f)
+
+                inputData = curdata['depthImages']
+                inputData = torch.from_numpy(inputData[:, :, :].astype(np.float32))
+
+
+                outputposHM = curdata['positionHeatMap']
+                ThetaAng = curdata['ThetaAng']
+                PhiAngle = curdata['PhiAngle']
+
+                GammaAngle = curdata['GammaAngle']
+                Less_than = GammaAngle < 0
+                GammaAngle[Less_than] = GammaAngle[Less_than] + 180
+                ThetaAng = torch.from_numpy(ThetaAng[:, :, :].astype(np.float32))
+                PhiAngle = torch.from_numpy(PhiAngle[:, :, :].astype(np.float32))
+                GammaAngle = torch.from_numpy(GammaAngle[:, :, :].astype(np.float32))
+                OutPosHm = torch.from_numpy(outputposHM[:, :, :].astype(np.float32))
+
+                outputData = torch.cat((ThetaAng, PhiAngle, GammaAngle, OutPosHm), dim=0)
+
 
         if self.AddNoise == True:
             inputData = inputData + (self.variance ** 0.5) * torch.rand(inputData.shape)

@@ -623,10 +623,10 @@ class BestPosModel_WithDenseLayer(nn.Module):
         return x
 
 
-class testModel(nn.Module):
+class EvenDataModel(nn.Module):
 
     def __init__(self, config):
-        super(testModel, self).__init__()
+        super(EvenDataModel, self).__init__()
 
         self.conva1 = nn.Conv2d(1, 8, config['num_filters'], padding=2, padding_mode=config['padding_mode'])
         self.poola = nn.MaxPool2d(2, 2)
@@ -729,10 +729,11 @@ class testModel(nn.Module):
         x = self.fc1(x)
         x = self.leakyRelu(x)
         x = self.fc3(x)
-        x = F.relu(x)
+        x = F.relu(x) # was once relu
         x = x.view(sz, 1, 60, 60)
 
         x = self.gaussian_filter(x)
+        x= torch.sigmoid(x)
 
         finalXformer = torchvision.transforms.Resize((60, 60))
         x = finalXformer(x)

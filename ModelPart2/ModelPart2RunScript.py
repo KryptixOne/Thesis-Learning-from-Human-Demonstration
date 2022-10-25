@@ -21,7 +21,7 @@ CONFIG = {
     'batch_size': 32,
     'meta_batch_size': 32,
     'iterations': 1000,
-    'adaptation_steps': 60,
+    'adaptation_steps': 15,
     'num_filters': 5,
     'num_filters_FC': 5,
     'momentum': 0.9,
@@ -29,7 +29,8 @@ CONFIG = {
     'adapt_lr': 0.1,
     'leakySlope': 0.08,
     'gaussianSigma': 0.8,
-    'dropout': 0.8
+    'dropout': 0.8,
+    'maskvalue':0.5
 
 }
 
@@ -62,7 +63,7 @@ class customLoss_7Channel(nn.Module):
                                torch.numel(TensorAnglesGamma))  # input should be in radians
         # critnew = nn.L1Loss()
         # lossMSEAngular =  critnew(TensorAngles, TargetTensor[:, 0:3, :, :])
-        loss = lossMSE + (1 / 3) * lossAngularGamma + (2 / 3) * lossAngularThetaPhi  # post Furkan Loss
+        loss = 0.25*lossMSE + (1 / 4) * lossAngularGamma + (1/2) * lossAngularThetaPhi  # post Furkan Loss
         # loss = lossMSE + lossAngularGamma + 2*lossAngularThetaPhi  #post Furkan Loss
 
         return loss
@@ -70,6 +71,7 @@ class customLoss_7Channel(nn.Module):
 
 def AugmentTasks(labels, NoiseToRegressionTargetAngles=False, LikelihoodsUpdates=False, UseSameNoise=False,
                  ChooseRandomPoints=False, NumRandomPoints=None):
+    global CONFIG
     augmentedLabels = labels.detach().clone()
     if NoiseToRegressionTargetAngles == True:
         ThetaAng = augmentedLabels[:, 0, :, :].detach().clone()  # -180 to 180
@@ -145,9 +147,9 @@ def AugmentTasks(labels, NoiseToRegressionTargetAngles=False, LikelihoodsUpdates
     elif ChooseRandomPoints == True:
         # choose few random points in likelihood map, hopefully will represent an update hm
         if NumRandomPoints is None:
-            NumRandomPoints = 5
-        blur = torchvision.transforms.GaussianBlur(3, sigma=1.0)
-        filterX3 = augmentedLabels[:, 3, :, :] < 0.5  # only areas with low probability selected
+            NumRandomPoints = 6
+        blur = torchvision.transforms.GaussianBlur(5, sigma=1.0)
+        filterX3 = augmentedLabels[:, 3, :, :] < CONFIG['maskvalue']  # only areas with low probability selected
         filterX3 = filterX3[:, None, :, :]
 
         newOnes = torch.zeros(filterX3.shape)
@@ -193,7 +195,7 @@ def AugmentTasks(labels, NoiseToRegressionTargetAngles=False, LikelihoodsUpdates
         augmentedLabels = torch.cat((x, newOnes), dim=1)
 
     else:
-        filterX3 = augmentedLabels[:, 3, :, :] < 0.5  # only areas with low probability selected
+        filterX3 = augmentedLabels[:, 3, :, :] < CONFIG['maskvalue']  # only areas with low probability selected
         filterX3 = filterX3[:, None, :, :]
         x0_temp = augmentedLabels[:, 0, :, :].detach().clone()
         x0_temp = x0_temp[:, None, :, :]
@@ -219,6 +221,8 @@ def AugmentTasks(labels, NoiseToRegressionTargetAngles=False, LikelihoodsUpdates
 def fast_adapt(batch, learner, loss, adaptation_steps, device,
                NoiseToTarget=False, LikelihoodUpdate=False, UseSameNoise=False, ChooseRandomPoints=False):
     data, labels = batch
+    #data = data[:,0,:,:]
+    #data =data[:,None,:,:]
     labels = AugmentTasks(labels, NoiseToRegressionTargetAngles=NoiseToTarget, LikelihoodsUpdates=LikelihoodUpdate,
                           UseSameNoise=UseSameNoise, ChooseRandomPoints=ChooseRandomPoints)
     data, labels = data.to(device), labels.to(device)
@@ -243,13 +247,13 @@ def fast_adapt(batch, learner, loss, adaptation_steps, device,
         # print('valid error:',valid_error )
 
     # Evaluate the adapted model
-    pred = learner(adaptation_data)
-    train_error = loss(pred, adaptation_labels)
+    #pred = learner(adaptation_data)
+    #rain_error = loss(pred, adaptation_labels)
     predictions = learner(evaluation_data)
-    # valid_error = loss(predictions, evaluation_labels)
+    valid_error = loss(predictions, evaluation_labels)
     # print(valid_error)
 
-    return train_error, predictions, evaluation_labels  # , valid_accuracy
+    return valid_error, predictions, evaluation_labels  # , valid_accuracy
 
 
 def save_checkpoint(state, is_best, filename="checkpoint.pth.tar"):
@@ -268,8 +272,8 @@ def main(
     adaptation_steps = int(config['adaptation_steps'])
     test_steps = 10
     seed = 42
-    Create_checkpoint = True
-    load_checkpoint = True
+    Create_checkpoint = False
+    load_checkpoint = False
     testing = False
 
     random.seed(seed)
@@ -289,7 +293,7 @@ def main(
     loss = customLoss_7Channel()
     trainbest_loss = float("inf")
     valbest_loss = float("inf")
-    CHECKPOINT_PATH = r'/mnt/d/Thesis/ThesisCode_Models/ModelPart2/AugmentedData_RandomPoints_checkpoint.pth.tar'
+    CHECKPOINT_PATH = r'/mnt/d/Thesis/ThesisCode_Models/ModelPart2/Results/PostFurkanLoss/Post_Furkan_chat_DualLoss_Best_DeepNet_checkpoint.pth.tar'
     if load_checkpoint == True:
         print('loading checkpoint from ' + CHECKPOINT_PATH)
         checkpoint = torch.load(CHECKPOINT_PATH, map_location=device)
@@ -366,12 +370,18 @@ def main(
                 train_iter = iter(trainloader)
                 batch = next(train_iter)
 
+            #likeupdate = bool(random.getrandbits(1))
+            #randompoint =bool(random.getrandbits(1))
+
+            likeupdate = False
+            randompoint =False
+
             evaluation_error, predicted, evalLabels = fast_adapt(batch,
                                                                  learner,
                                                                  loss,
                                                                  adaptation_steps,
-                                                                 device, NoiseToTarget=True, LikelihoodUpdate=False,
-                                                                 ChooseRandomPoints=True
+                                                                 device, NoiseToTarget=True, LikelihoodUpdate=likeupdate,
+                                                                 ChooseRandomPoints=randompoint
                                                                  )
 
             evaluation_error.backward()
@@ -392,11 +402,12 @@ def main(
                                                                  learner,
                                                                  loss,
                                                                  adaptation_steps,
-                                                                 device, NoiseToTarget=True, LikelihoodUpdate=False,
-                                                                 ChooseRandomPoints=True
+                                                                 device, NoiseToTarget=True, LikelihoodUpdate=likeupdate,
+                                                                 ChooseRandomPoints=randompoint
                                                                  )
 
             meta_valid_error += evaluation_error.item()
+
 
         # Print some metrics
         print('\n')
@@ -433,7 +444,7 @@ def main(
                     'trainloss': trainbest_loss,
                     "optimizer": opt.state_dict(),
                 },
-                is_best, filename="AugmentedData_RandomPoints_checkpoint.pth.tar"
+                is_best, filename="AugmentedData_NoPositionMap_checkpoint.pth.tar"
             )
 
 
@@ -467,7 +478,7 @@ if __name__ == '__main__':
 
     def train_function():
 
-        with wandb.init(project='AugmentedData_MetaAdpt', config=CONFIG, entity='kryptixone'):
+        with wandb.init(project='SingleInputMaml', config=CONFIG, entity='kryptixone'):
             main(wandb.config, trainloader, valloader, testloader, testtestloader)
 
 
@@ -498,7 +509,7 @@ if __name__ == '__main__':
         SWEEP_CONFIG['parameters'] = parameters_dict
 
         parameters_dict.update({'iterations': {'value': 1}})
-        sweep_id = wandb.sweep(SWEEP_CONFIG, project="AugmentedDataSweep_MLR")
+        sweep_id = wandb.sweep(SWEEP_CONFIG, project="SingleInputMaml")
         wandb.agent(sweep_id, function=train_function, count=50)  # main(args.network)
     else:
         train_function()

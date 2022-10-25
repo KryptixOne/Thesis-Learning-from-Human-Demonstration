@@ -30,7 +30,7 @@ from collections import Counter
 from Dataloader.FolderDataPart1 import FolderData
 from Models.Models import SphericalModelDeep, ResNetModelBased, ModelBasedOnPaperGitHubVersionSINGLEBRANCH, \
     SingleBranchHpLp, ModelBasedOnPaperGitHubVersion, ModelBasedOnPaperNoneSpherical, FirstWorkingModelForPos_NoDense, \
-    BestPosModel_WithDenseLayer, testModel
+    BestPosModel_WithDenseLayer
 
 # temp path for Data
 DATASET_PATH_win = r"D:/Thesis/ThesisCode_Models/DataToWorkWith/Data_Spherical_With_PosPmaps60.pickle"
@@ -90,15 +90,15 @@ def create_feature_images(TensorImg, nameOfFile):
 
 
 def load_data(path, batch_size, keys_path=None, bad_keys_path=None, network=None):
-    pre_split_available = True
-    data_not_formatted = True
+    pre_split_available = False
+    data_not_formatted = False
     start_training = False
     use_residuals = False
     use_single_file_as_dataset = False
     use_FolderData = True
     # path_of_individual_items_not_normalized = r'/mnt/d/Thesis/Thesis Code/Data_Created/DataWithOrientationHM/grasps'
-    path_of_individual_items_not_normalized = r'/mnt/d/Thesis/HumanDemonstrated/HumanDemonstrated_withKDE/Pouring'
-    path_of_individual_items_normalized = r'/mnt/d/Thesis/HumanDemonstrated/HumanDemonstrated_Normalized/Pouring'
+    path_of_individual_items_not_normalized = r'/mnt/d/Thesis/HumanDemonstrated/HumanDemonstrated_withKDE/Tooluse'
+    path_of_individual_items_normalized = r'/mnt/d/Thesis/HumanDemonstrated/HumanDemonstrated_Normalized/Tooluse'
 
     # run After Data_not formatted
     # dataset_To_prepsplit
@@ -465,9 +465,9 @@ def load_data(path, batch_size, keys_path=None, bad_keys_path=None, network=None
             categories = list(dict.fromkeys(onlyfiles))
             a = dict(Counter(onlyfiles))
             categories_sorted = dict(sorted(a.items(), key=lambda item: item[1]))
-            train_categories = {key: val for key, val in categories_sorted.items() if val >= 15}
-            testVal_categories = {key: val for key, val in categories_sorted.items() if val < 15}
-            val_categories, test_categories = train_test_split(list(testVal_categories.keys()), test_size=0.3)
+            #train_categories = {key: val for key, val in categories_sorted.items() if val >= 15}
+            #testVal_categories = {key: val for key, val in categories_sorted.items() if val < 15}
+            #val_categories, test_categories = train_test_split(list(testVal_categories.keys()), test_size=0.3)
 
             if create_categories == True:
                 for category in categories:
@@ -649,7 +649,7 @@ def load_data(path, batch_size, keys_path=None, bad_keys_path=None, network=None
                                 pickle.dump(data_dict, handle, protocol=pickle.HIGHEST_PROTOCOL)
                     else:
                         with open(
-                                r'/mnt/d/Thesis/HumanDemonstrated/HumanDemonstrated_Normalized/Pouring/' +
+                                r'/mnt/d/Thesis/HumanDemonstrated/HumanDemonstrated_Normalized/Tooluse/' +
                                 str(item).split('_')[0] + r'/' + str(item)[
                                                                  :-7] + 'vers_' + str(x) + '.pickle',
                                 'wb') as handle:
