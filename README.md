@@ -15,7 +15,7 @@ of the absolute position of a grasp occuring. This prediction is given based off
 
 Visual results of such predictions using Model Part I are as depicted:
 
-<img src="https://github.com/KryptixOne/Thesis-Learning-from-Human-Demonstration/blob/main/Images/FinalModelPart1_VisualResults.PNG" width="600" />
+<img src="https://github.com/KryptixOne/Thesis-Learning-from-Human-Demonstration/blob/main/Images/FinalModelPart1_VisualResults.PNG" width="800" />
 
 ## Model Part II
 
