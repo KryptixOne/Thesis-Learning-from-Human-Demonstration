@@ -1,5 +1,5 @@
 # Robotic Task Learning From Human Demonstrations using Spherical Representations
-Full project description and work available [here](https://drive.google.com/file/d/13vBX1J4_3KLHbya9zJw0oxTyxLq4XuAt/view).
+Full project paper and work available [here](https://drive.google.com/file/d/13vBX1J4_3KLHbya9zJw0oxTyxLq4XuAt/view).
 
 The repository at hand is designed into two modular DNNs such that they can ultimately be use used as in the following figure
 
