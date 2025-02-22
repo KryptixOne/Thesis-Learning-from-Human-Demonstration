@@ -1,20 +1,19 @@
-# Robotic Task Learning From Human Demonstrations using Spherical Representations
+# Robotic Task Learning from Human Demonstrations using Spherical Representations
+
 Full project paper and work available [here](https://drive.google.com/file/d/13vBX1J4_3KLHbya9zJw0oxTyxLq4XuAt/view).
 
-The repository at hand is designed into two modular DNNs such that they can ultimately be use used as in the following figure
+This repository contains two modular deep neural networks (DNNs) designed for robotic task learning from human demonstrations using spherical representations. The models work in tandem as shown in the figure below:
 
 <img src="https://github.com/KryptixOne/Thesis-Learning-from-Human-Demonstration/blob/main/Images/Pipeline%20General.PNG" width="800" />
 
-
 ## Model Part I
-
 
 <img src="https://github.com/KryptixOne/Thesis-Learning-from-Human-Demonstration/blob/main/Images/FinalModelPartI.PNG" width="800" />
 
-Model Part 1 is the name given to the model used to determine the likelihood maps asssociated with the probability
-of the absolute position of a grasp occuring. This prediction is given based off of an input 2-D image which was created via a hemispherical transform on a 3-D object mesh.
+Model Part I predicts likelihood maps representing the probability distribution of grasp positions. The model takes a 2D image as input, generated via a hemispherical transformation of a 3D object mesh, and outputs likelihood estimates of where a grasp is most likely to occur.
 
-Visual results of such predictions using Model Part I are as depicted:
+### Visual Results
+Predictions from Model Part I are depicted below:
 
 <img src="https://github.com/KryptixOne/Thesis-Learning-from-Human-Demonstration/blob/main/Images/FinalModelPart1_VisualResults.PNG" width="800" />
 
@@ -22,18 +21,23 @@ Visual results of such predictions using Model Part I are as depicted:
 
 <img src="https://github.com/KryptixOne/Thesis-Learning-from-Human-Demonstration/blob/main/Images/ModelForPartII.PNG" width="800" />
 
-Model Part 2 is the meta-learned (using First-Order MAML) model that was tasks with updating the likelihood maps produced in Model Part 1 according to demonstrated human grasps.
-Model Part 2 also outputs the maximum liklihood angles (azimuth, zenith and our rotational angle gamma).
-As input Model Part 2 takes both the spherically transformed mesh image and the priors produced in Model part 1.
+Model Part II is a meta-learned model trained using First-Order MAML (FOMAML). It refines the likelihood maps produced by Model Part I based on human demonstration data. Additionally, it outputs maximum likelihood grasp angles, including azimuth, zenith, and a rotational angle (γ). Model Part II takes as input both the spherically transformed mesh image and the likelihood priors from Model Part I.
 
-When training such a model with FOMAML , we found that the best form of task-augmentation was additive discrete noise towards the angular data (see below). In such cases, the base-learner was still capable of 
-adapting its predictions. When attempting task-augmentations on the labelled likelihood maps, the FOMAML trained model was not flexible enough. 
+### Task Augmentation and Training Insights
+While training Model Part II with FOMAML, we explored different task augmentation strategies:
+- **Effective Augmentation:** Adding discrete noise to angular data improved adaptability without degrading performance.
+- **Ineffective Augmentation:** Modifying labeled likelihood maps negatively impacted the model’s flexibility.
 
+#### Effect of Noise on MAML Training
 
 <img src="https://github.com/KryptixOne/Thesis-Learning-from-Human-Demonstration/blob/main/Images/EffectOfNoiseOnMAML.png" width="800" />
-a) the Labelled data for b) the predicted data
+*(a) Labeled data vs. (b) Predicted data*
 
-## Data Generator:
-For data Generation used for these models, see my other repository:
-https://github.com/KryptixOne/Spherical-Data-Generation-For-3D-Meshes
+## Data Generation
+The dataset used for training these models was generated using a custom pipeline. Details can be found in the following repository:
+[Spherical Data Generation for 3D Meshes](https://github.com/KryptixOne/Spherical-Data-Generation-For-3D-Meshes).
+
+---
+
+This repository provides an approach to robotic grasp learning through human demonstrations, leveraging spherical representations and meta-learning techniques. Contributions, issues, and discussions are welcome!
 
